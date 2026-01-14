@@ -5,7 +5,7 @@ import "./confige/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 
-const app=exprexx();
+const app=express();
 
 app.use(cors());
 app.use(express.json());
