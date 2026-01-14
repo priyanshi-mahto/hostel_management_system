@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use("/api/auth",authRoutes);
 app.use("/api/student",studentRoutes);
-app.use("/api/warden",authRoutes);
+app.use("/api/warden",wardenRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/complaint",complaintRoutes);
 app.use("/api/leave",leaveRoutes);
