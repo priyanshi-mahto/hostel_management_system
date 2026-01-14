@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import "./confige/env.js";
 
-import autoRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 
 const app=exprexx();
