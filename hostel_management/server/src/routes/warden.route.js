@@ -17,7 +17,7 @@ router.use(allowRoles("WARDEN"));
 
 router.get("/dashboard",getDashboard);
 
-router.post("/leave/:leaveId/approve" ,protect,allowRoles("WARDEN"), approveLeave);
+router.post("/leave/:leaveId/approve" , approveLeave);
 router.post("/leave/:leaveId/reject",rejectLeave);
 
 router.post("/verify-id/:studentId" , verifyStudentId);
