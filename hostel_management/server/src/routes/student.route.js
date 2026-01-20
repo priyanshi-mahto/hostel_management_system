@@ -9,7 +9,7 @@ const router=express.Router();
 router.use(protect);
 router.use(allowRoles("STUDENT"));
 
-router.get("/profile",getProfile);
+router.get("/profile",protect,getProfile);
 router.put("/profile",updateProfile);
 
 router.post("/complaint",raiseComplaint);

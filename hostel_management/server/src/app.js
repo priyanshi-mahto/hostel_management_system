@@ -8,6 +8,7 @@ import wardenRoutes from "./routes/warden.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import complaintRoutes from "./routes/complaint.route.js";
 import leaveRoutes from "./routes/leave.route.js"
+import { errorHandler } from "./middleware/error.middleware.js";
 
 const app=express();
 
@@ -19,6 +20,6 @@ app.use("/api/student",studentRoutes);
 app.use("/api/warden",wardenRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/complaint",complaintRoutes);
-app.use("/api/leave",leaveRoutes);
+app.use(errorHandler);
 
 export default app;
