@@ -1,8 +1,10 @@
 CREATE DATABASE hostel_management_system;
 USE hostel_management_system;
 
-CREATE TABLE user(
+CREATE TABLE users(
   user_id INT AUTO_INCREMENT PRIMARY KEY,
+  password VARCHAR(255) NOT NULL
+ CHECK (CHAR_LENGTH(password)>=8),
   email VARCHAR(100) NOT NULL UNIQUE,
   role ENUM('HOSTEL_ADMIN','STUDENT','STAFF','WARDEN') NOT NULL
 );
@@ -21,10 +23,10 @@ CREATE TABLE warden(
    hostel_id INT NOT NULL UNIQUE,
    user_id INT NOT NULL UNIQUE,
    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE warden_contact_deatils(
+CREATE TABLE warden_contact_details(
    contact_id INT AUTO_INCREMENT PRIMARY KEY,
    phone CHAR(10) ,
    warden_id INT NOT NULL UNIQUE,
@@ -34,26 +36,13 @@ CREATE TABLE warden_contact_deatils(
 
 CREATE TABLE room(
    room_id INT AUTO_INCREMENT PRIMARY KEY,
-   unit INT NOT NULL,
+   unit INT NOT NULL ,
    CHECK (unit BETWEEN 100 AND 999),
-   
-   room_no VARCHAR(2) NOT NULL,
+   floor INT NOT NULL,
+   room_no VARCHAR(10) NOT NULL,
    hostel_id INT NOT NULL,
+   UNIQUE(hostel_id,unit,room_no),
    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE guardian(
-  guardian_id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50),
-  relationship VARCHAR(40),
-  phone CHAR(10),
-  CHECK (phone REGEXP '^[0-9]{10}$'),
-  house_no VARCHAR(50),
-  street VARCHAR(255),
-  area VARCHAR(100),
-  city VARCHAR(100),
-  state VARCHAR(30),
-  pincode VARCHAR(10)
 );
 
 CREATE TABLE student (
@@ -69,16 +58,30 @@ CREATE TABLE student (
    state VARCHAR(30),
    pincode VARCHAR(10),
    gender ENUM('MALE','FEMALE','NOT PREFER TO SAY') NOT NULL,
-   room_id INT NOT NULL UNIQUE,
    user_id INT NOT NULL UNIQUE,
-   roll_no VARCHAR(20),
+   roll_no VARCHAR(20) NOT NULL UNIQUE,
    phone CHAR(10),
    CHECK (phone REGEXP '^[0-9]{10}$'),
-   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE STUDENT_ID_CARD (
+CREATE TABLE guardian(
+  guardian_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50),
+  relationship VARCHAR(40),
+  phone CHAR(10),
+  CHECK (phone REGEXP '^[0-9]{10}$'),
+  house_no VARCHAR(50),
+  street VARCHAR(255),
+  area VARCHAR(100),
+  city VARCHAR(100),
+  state VARCHAR(30),
+  pincode VARCHAR(10),
+  student_id INT NOT NULL,
+  FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE student_id_card(
     id_card_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL UNIQUE,
     id_front_image VARCHAR(255) NOT NULL,
@@ -87,7 +90,7 @@ CREATE TABLE STUDENT_ID_CARD (
 	DEFAULT 'PENDING',
     verified_by INT,
     FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (verified_by) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (verified_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE room_allocation(
@@ -108,17 +111,17 @@ CREATE TABLE office_staff(
    user_id INT NOT NULL,
    hostel_id INT NOT NULL,
    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE complaint(
    complaint_id INT AUTO_INCREMENT PRIMARY KEY,
    category ENUM('Plumbing','Electrical','Internet','Cleanliness','Civil','Other') NOT NULL,
    title VARCHAR(100) NOT NULL,
-   descriptiom TEXT ,
+   description TEXT ,
    status ENUM('Pending','Resolved') 
    DEFAULT 'Pending',
-   date DATETIME ,
+   date DATETIME DEFAULT CURRENT_TIMESTAMP,
    student_id INT NOT NULL,
    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -160,7 +163,7 @@ CREATE TABLE lost_and_found(
    type ENUM('Lost','Found') NOT NULL,
    status ENUM('Active','Claimed')
    DEFAULT 'Active',
-   date DATETIME NOT NULL,
+   date DATETIME DEFAULT CURRENT_TIMESTAMP,
    hostel_id INT NOT NULL,
    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -174,17 +177,20 @@ CREATE TABLE notification(
 CREATE TABLE roommate(
    roommate_id INT NOT NULL,
    student_id INT NOT NULL,
+   room_id INT NOT NULL,
    PRIMARY KEY(roommate_id,student_id),
    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (roommate_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY (roommate_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
+   FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE COMPLAINT_FEEDBACK (
+CREATE TABLE complaint_feedback (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,
     complaint_id INT NOT NULL UNIQUE,
     student_id INT NOT NULL,
     -- Star rating (1 to 5)
     rating INT NOT NULL,
+    satisfaction ENUM ('Satisfied','Unsatisfied','False Fix'),
     feedback_text TEXT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CHECK (rating BETWEEN 1 AND 5),
@@ -192,7 +198,7 @@ CREATE TABLE COMPLAINT_FEEDBACK (
     FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE LEAVE_REQUEST (
+CREATE TABLE leave_request (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     from_date DATE NOT NULL,
@@ -203,7 +209,6 @@ CREATE TABLE LEAVE_REQUEST (
     approved_by INT,
     approved_at TIMESTAMP,
     CHECK (to_date >= from_date),
-    FOREIGN KEY (student_id) REFERENCES student(student_id),
-    FOREIGN KEY (approved_by) REFERENCES user(user_id)
+    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (approved_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
-
