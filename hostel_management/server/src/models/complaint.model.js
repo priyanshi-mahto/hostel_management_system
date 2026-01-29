@@ -4,7 +4,7 @@ export const createComplaint = async (data) => {
     const {category ,title , description , studentId } = data;
 
     await pool.query(
-    `INSERT INTO complaint (category, title, descriptiom, student_id, date)
+    `INSERT INTO complaint (category, title, description, student_id, date)
      VALUES (?, ?, ?, ?, NOW())`,
     [category, title, description, studentId]
     );

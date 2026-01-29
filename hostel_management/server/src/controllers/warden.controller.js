@@ -37,3 +37,12 @@ export const verifyStudentId = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const updateComplaint = async (req, res) => {
+  try {
+    await updateComplaintStatus(req.params.complaintId, "Resolved");
+    res.json({ message: "Complaint Resolved" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
