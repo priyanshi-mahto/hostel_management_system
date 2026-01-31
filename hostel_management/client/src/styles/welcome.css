@@ -1,0 +1,45 @@
+.welcome{
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef4ff, #f6ecff);
+    display: flex;
+    flex-direction:column;
+}
+
+.hero-center{
+    flex:1;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero-center span{
+    color:#904fff;
+}
+
+.hero-center p{
+    margin-top: 20px;
+    max-width: 650px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #6b7280;
+}
+
+.primary-btn{
+    margin-top: 35px;
+    padding: 14px 36px;
+    border-radius: 30px;
+    border: none;
+    background: #904fff;
+    color:white;;
+    font-size: 17px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.primary-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(79,124,255,0.35);
+}
