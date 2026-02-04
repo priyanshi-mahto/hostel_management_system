@@ -16,7 +16,7 @@
 }
 
 .hero-center span{
-    color:#904fff;
+    color:#b845a9;
 }
 
 .hero-center p{
@@ -32,7 +32,8 @@
     padding: 14px 36px;
     border-radius: 30px;
     border: none;
-    background: #904fff;
+    width:200px;
+    background: #b845a9;
     color:white;;
     font-size: 17px;
     cursor: pointer;
@@ -41,5 +42,5 @@
 
 .primary-btn:hover{
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(79,124,255,0.35);
+    box-shadow: 1px 12px 30px #99278a;
 }

@@ -1,12 +1,17 @@
 .navbar{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 80px;
+    background:#eef4ff;
+    box-shadow: 0 3px 10px #ede0eb ;
 }
 
 .logo{
-    color:#904fff;
+    color:#b845a9;
     font-weight: 700;
 }
 
@@ -28,10 +33,14 @@
 }
 
 .login-btn{
-    background: #904fff;
+    background: #b845a9;
     color: white;
     border:none;
     padding:10px 24px;
     border-radius: 25px;
     cursor: pointer;
+}
+
+.login-btn:hover{
+     box-shadow: 1px 4px 30px #99278a;
 }
