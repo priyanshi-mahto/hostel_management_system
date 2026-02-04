@@ -1,5 +1,10 @@
 import axios from "./axios";
 
+export const getStudentDashboard = async () => {
+  const res = await axios.get("/student/dashboard");
+  return res.data;
+};
+
 export const getStudentProfile = async () => {
   const res = await axios.get("/student/profile");
   return res.data;
