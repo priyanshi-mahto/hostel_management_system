@@ -46,3 +46,12 @@ export const updateComplaint = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getComplaints = async (req, res) => {
+  try {
+    const complaints = await getAllComplaints();
+    res.json(complaints);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

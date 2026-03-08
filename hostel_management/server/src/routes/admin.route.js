@@ -1,5 +1,5 @@
 import express from "express";
-import {createHostel,createRoom,assignWarden,getAllUsers,getAllHostels} from "..//controllers/admin.controller.js";
+import {createHostel,createRoom,assignWarden,getUsers as getAllUsers,getAllHostels} from "../controllers/admin.controller.js";
 
 import {protect} from "../middleware/auth.middleware.js";
 import {allowRoles} from "../middleware/role.middleware.js";

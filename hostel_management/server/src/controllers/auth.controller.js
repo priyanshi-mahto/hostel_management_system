@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {reateUser,findUserByEmail} from "../models/user.model.js";
+import {createUser,findUserByEmail} from "../models/user.model.js";
 
 const generateToken =(user)=>{
     return jwt.sign(
@@ -28,16 +28,20 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password  } = req.body;
 
     const user = await findUserByEmail(email);
     if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    if (user.password !== password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user);
     res.json({ token, role: user.role });
   } catch (err) {
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  getAllLeaves,
+  fetchAllLeaves as getAllLeaves,
   approveLeave,
   rejectLeave
 } from "../controllers/leave.controller.js";

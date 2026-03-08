@@ -1,0 +1,116 @@
+.profile-page {
+  padding: 15px;
+  background: #f5f7fb;
+}
+
+.page-title h2 {
+  margin-bottom: 5px;
+}
+
+.page-title p {
+  color: #6b7280;
+}
+
+/* MAIN PROFILE CARD */
+
+.profile-card-main {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.profile-card-main img {
+  width: 90px;
+  border-radius: 50%;
+}
+
+.edit-btn {
+  float: right;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin: 8px 0;
+}
+
+.primary-btn {
+  margin-top: 15px;
+  width: 100%;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.secondary-btn {
+  margin-top: 10px;
+  width: 100%;
+  background: #e0f2fe;
+  color: #1d4ed8;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+/* INFO SECTIONS */
+
+.info-section {
+  margin-top: 20px;
+}
+
+.info-section h4 {
+  margin-bottom: 10px;
+}
+
+.info-box {
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.info-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.icon {
+  background: #e0f2fe;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.value {
+  font-weight: 500;
+}
+
+.empty-text {
+  color: gray;
+  padding: 15px;
+}

@@ -3,6 +3,7 @@ import{
     updateComplaintStatus,
     addComplaintFeedback
 } from "../models/complaint.model.js";
+import { findStudentByUserId } from "../models/student.model.js";
 
 export const fetchAllComplaints = async(req,res)=>{
     try{
@@ -38,6 +39,6 @@ export const submitFeedback = async(req,res)=>{
         });
         res.status(201).json({message:"Feedback submitted"});
     }catch(err){
-        res.status(500).jsoon({error:err.message});
+        res.status(500).json({error:err.message});
     }
 };

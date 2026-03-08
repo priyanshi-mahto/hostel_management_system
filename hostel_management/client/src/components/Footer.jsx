@@ -2,7 +2,7 @@ import "../styles/footer.css"
 
 export default function Footer(){
     return (
-        <footer classname="footer">
+        <footer className="footer">
             <div className="footer-container">
                 <div className="footer-left">
                     <h3>IIT Indore</h3>
@@ -16,7 +16,7 @@ export default function Footer(){
                 </div>
 
                 <div className="footer-right">
-                    <p>© {new Date().getFullYear} HMS</p>
+                    <p>© {new Date().getFullYear()} HMS</p>
                     <p>All Rights Reserved</p>
                 </div>
             </div>

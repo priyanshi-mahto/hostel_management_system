@@ -22,11 +22,13 @@ import Welcome from "./pages/Welcome";
 import Login from "./pages/auth/Login";
 // import Register from "./pages/auth/Register";
 
-// import StudentDashboard from "./pages/student/StudentDashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import MyProfile from "./pages/student/MyProfile";
+import EditProfile from "./pages/student/EditProfile";
 // import WardenDashboard from "./pages/warden/WardenDashboard";
 // import AdminDashboard from "./pages/admin/AdminDashboard";
 
-// import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function AppRouter() {
   return (
@@ -38,14 +40,23 @@ export default function AppRouter() {
         {/* <Route path="/register" element={<Register />} /> */}
 
         {/* Student */}
-        {/* <Route
+        <Route
           path="/student"
           element={
             <ProtectedRoute role="STUDENT">
               <StudentDashboard />
             </ProtectedRoute>
           }
-        /> */}
+        />
+
+        <Route
+          path="/student/profile"
+          element={
+            <ProtectedRoute role="STUDENT">
+              <MyProfile />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Warden */}
         {/* <Route
