@@ -11,7 +11,7 @@ router.use(allowRoles("STUDENT"));
 
 router.get("/dashboard", getDashboard);
 
-router.get("/profile", protect, getProfile);
+router.get("/profile", getProfile);
 router.put("/profile", updateProfile);
 
 router.post("/complaint", raiseComplaint);

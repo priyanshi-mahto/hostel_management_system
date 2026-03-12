@@ -1,3 +1,4 @@
+import pool from "../config/db.js";
 import {
   findStudentByUserId,
   updateStudentProfile,
@@ -99,7 +100,25 @@ export const getLeaves = async (req, res) => {
 };
 
 export const createVisitingRequest = async (req, res) => {
-    res.status(501).json({ message: "Not implemented" });
+    try {
+        const student = await findStudentByUserId(req.user.user_id);
+        if (!student) return res.status(404).json({ message: "Student not found" });
+
+        const { visitor_name, visitor_phone, visit_date, purpose } = req.body;
+        
+        if (!visitor_name || !visitor_phone || !visit_date || !purpose) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        await pool.query(
+            `INSERT INTO visiting_request (student_id, visitor_name, visitor_phone, visit_date, purpose, created_at)
+             VALUES (?, ?, ?, ?, ?, NOW())`,
+            [student.student_id, visitor_name, visitor_phone, visit_date, purpose]
+        );
+        res.status(201).json({ message: "Visiting request created" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 export const getDashboard = async (req, res) => {

@@ -35,11 +35,30 @@ export const getUsers = async(req,res)=>{
 };
 
 export const assignWarden = async (req, res) => {
-    // TODO: implement actual assignment logic
-    res.status(501).json({ message: "assignWarden not implemented" });
+    try {
+        const { userId, hostelId } = req.body;
+        
+        if (!userId || !hostelId) {
+            return res.status(400).json({ message: "User ID and Hostel ID are required" });
+        }
+
+        await pool.query(
+            "INSERT INTO warden (user_id, hostel_id) VALUES (?, ?)",
+            [userId, hostelId]
+        );
+        res.status(201).json({ message: "Warden assigned successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 export const getAllHostels = async (req, res) => {
-    // TODO: return hostels from DB
-    res.json([]);
+    try {
+        const [hostels] = await pool.query(
+            "SELECT hostel_id, hostel_name, type, number_of_rooms, capacity FROM hostel"
+        );
+        res.json(hostels);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };

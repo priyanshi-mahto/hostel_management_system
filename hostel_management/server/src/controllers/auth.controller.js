@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import {createUser,findUserByEmail} from "../models/user.model.js";
 
 const generateToken =(user)=>{
@@ -9,17 +10,23 @@ const generateToken =(user)=>{
     );
 }
 
-
 export const register = async (req, res) => {
   try {
-    const { email, role } = req.body;
+    const { email, password, role } = req.body;
+
+    if (!email || !password || !role) {
+      return res.status(400).json({ message: "Email, password, and role are required" });
+    }
 
     const existing = await findUserByEmail(email);
     if (existing) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    await createUser(email, role);
+    // Hash password with bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    await createUser(email, hashedPassword, role);
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -28,13 +35,20 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password  } = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
     const user = await findUserByEmail(email);
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    if (user.password !== password) {
+
+    // Compare password with bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 

@@ -1,9 +1,9 @@
 import pool from "../config/db.js";
 
-export const createUser = async (email,role)=>{
+export const createUser = async (email, password, role)=>{
     const [result] = await pool.query(
-        "INSERT INTO users (email,role) VALUES(?,?)",
-        [email,role]
+        "INSERT INTO users (email, password, role) VALUES(?,?,?)",
+        [email, password, role]
     );
     return result.insertId;
 };
@@ -18,9 +18,10 @@ export const findUserByEmail = async(email) => {
 
 export const findUserById = async(userId)=>{
     const[rows] = await pool.query(
-    "SELECT * FROM users WHERE  user_id = ?",
+    "SELECT * FROM users WHERE user_id = ?",
     [userId]
     );
+    return rows[0];
 };
 
 export const getAllUsers = async () => {

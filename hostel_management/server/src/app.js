@@ -2,9 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
-
 import cors from "cors";
 import "./config/env.js";
 
@@ -18,14 +15,20 @@ import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 
-// Simple request logger to help debug CORS/preflight handling
+// Request logger
 app.use((req, res, next) => {
-  console.log(new Date().toISOString(), req.method, req.originalUrl, "Origin:", req.headers.origin || "<none>");
+  console.log(new Date().toISOString(), req.method, req.originalUrl);
   next();
 });
 
-// Allow all origins temporarily for debugging preflight
-app.use(cors({ origin: true, credentials: true }));
+// Configure CORS properly
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5173'];
+app.use(cors({ 
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
@@ -34,6 +37,7 @@ app.use("/api/student",studentRoutes);
 app.use("/api/warden",wardenRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/complaint",complaintRoutes);
+app.use("/api/leave",leaveRoutes);
 app.use(errorHandler);
 
 export default app;
