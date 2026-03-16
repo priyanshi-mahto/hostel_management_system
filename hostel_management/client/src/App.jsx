@@ -20,6 +20,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/auth/Login";
+import ChangePassword from "./components/ChangePassword";
 // import Register from "./pages/auth/Register";
 
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -56,6 +57,24 @@ export default function AppRouter() {
               <MyProfile />
             </ProtectedRoute>
           }
+        />
+
+        <Route
+         path="/student/change-password"
+         element={
+          <ProtectedRoute role="STUDENT">
+          <ChangePassword />
+          </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/student/edit-profile"
+        element={
+         <ProtectedRoute role="STUDENT">
+         <EditProfile />
+         </ProtectedRoute>
+         }
         />
 
         {/* Warden */}

@@ -1,6 +1,7 @@
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import EditProfile from "./EditProfile";
+import ChangePasswordModal from "../../components/ChangePassword";
 import { useEffect, useState } from "react";
 import { getStudentProfile } from "../../api/student.api";
 import "../../styles/myProfile.css";
@@ -10,6 +11,7 @@ export default function MyProfile() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [data, setData] = useState(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -77,7 +79,12 @@ export default function MyProfile() {
 
           <p>Computer Science and Engineering | BTech</p>
 
-          <button className="primary-btn">Change Password</button>
+          <button
+  className="primary-btn"
+  onClick={() => setShowPasswordModal(true)}
+>
+  Change Password
+</button>
           <button className="secondary-btn">Manage Sessions</button>
         </div>
 
@@ -148,7 +155,10 @@ export default function MyProfile() {
 
       </div>
 
-      {editOpen && <EditProfile onClose={handleCloseEdit} />}
+      {editOpen && <EditProfile onClose={() => setEditOpen(false)} />}
+        {showPasswordModal && (
+  <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
+)}
     </>
   );
 }

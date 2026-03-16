@@ -28,3 +28,13 @@ export const getAllUsers = async () => {
     const[rows] = await pool.query("SELECT * FROM users");
     return rows;
 };
+
+export const updateUserPassword = async (user_id, password) => {
+  const query = `
+    UPDATE users
+    SET password = ?
+    WHERE user_id = ?
+  `;
+    const [result] = await pool.query(query, [password, user_id]);
+    return result;
+};

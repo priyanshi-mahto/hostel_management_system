@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "../../styles/editProfile.css";
 import { getStudentProfile, updateStudentProfile } from "../../api/student.api";
 

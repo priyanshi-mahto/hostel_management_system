@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import {createUser,findUserByEmail} from "../models/user.model.js";
+import {createUser, findUserByEmail, findUserById, updateUserPassword} from "../models/user.model.js";
 
 const generateToken =(user)=>{
     return jwt.sign(
@@ -62,4 +61,34 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
   res.json(req.user);
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Both passwords are required" });
+    }
+
+    const userId = req.user?.user_id;
+    if (!userId) return res.status(401).json({ message: "Not authorized" });
+
+    const user = await findUserById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // verify current password (plaintext)
+    if (user.password !== currentPassword) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    // update password in database
+    await updateUserPassword(user.user_id, newPassword);
+
+    res.json({ message: "Password updated successfully" });
+
+  } catch (err) {
+    console.error("CHANGE PASSWORD ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
 };

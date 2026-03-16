@@ -14,3 +14,7 @@ export const getMe = async () => {
   const res = await axios.get("/auth/me");
   return res.data;
 };
+
+export const changePassword = (data) => {
+  return axios.post("/auth/change-password", data);
+};
