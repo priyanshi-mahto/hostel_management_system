@@ -40,7 +40,7 @@ export default function Header({
         ☰
       </button>
 
-      <h2>HMS</h2>
+      <h2>Hostel Management System</h2>
 
       {/* PROFILE */}
       <div className="profile-box" ref={dropdownRef}>

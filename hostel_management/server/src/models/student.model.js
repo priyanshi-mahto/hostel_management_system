@@ -26,7 +26,7 @@ export const getStudentProfileByUserId = async (userId) => {
 
         g.name AS guardian_name,
         g.phone AS guardian_phone,
-        g.email AS guardian_email,
+        g.relationship AS guardian_relationship,
 
         h.hostel_name,
         r.unit,
@@ -68,7 +68,7 @@ export const updateStudentProfile = async (userId, data) => {
 
   // Update guardian information
   if (guardian && guardian.name) {
-    const { name, phone: guardianPhone, email } = guardian;
+    const { name, phone: guardianPhone, relationship } = guardian;
     
     // Get student_id first
     const [studentRows] = await pool.query(
@@ -88,14 +88,14 @@ export const updateStudentProfile = async (userId, data) => {
       if (guardianRows.length > 0) {
         // Update existing guardian
         await pool.query(
-          "UPDATE guardian SET name=?, phone=?, email=? WHERE student_id=?",
-          [name, guardianPhone || null, email || null, studentId]
+          "UPDATE guardian SET name=?, phone=?, relationship=? WHERE student_id=?",
+          [name, guardianPhone || null, relationship || null, studentId]
         );
       } else {
         // Create new guardian
         await pool.query(
-          "INSERT INTO guardian (name, phone, email, student_id) VALUES (?, ?, ?, ?)",
-          [name, guardianPhone || null, email || null, studentId]
+          "INSERT INTO guardian (name, phone, relationship, student_id) VALUES (?, ?, ?, ?)",
+          [name, guardianPhone || null, relationship || null, studentId]
         );
       }
     }

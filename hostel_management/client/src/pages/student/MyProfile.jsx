@@ -78,7 +78,7 @@ export default function MyProfile() {
         <Section title="Guardian Information">
           <Info label="Guardian Name" value={data.guardian_name} />
           <Info label="Guardian Phone" value={data.guardian_phone} />
-          <Info label="Guardian Email" value={data.guardian_email} />
+          <Info label="Guardian Relationship" value={data.guardian_relationship} />
         </Section>
 
         {/* HOSTEL INFO */}

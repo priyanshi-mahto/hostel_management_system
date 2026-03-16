@@ -17,7 +17,7 @@ export default function EditProfileModal({ onClose }) {
   const [guardian, setGuardian] = useState({
     name: "",
     phone: "",
-    email: "",
+    relationship: "",
   });
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function EditProfileModal({ onClose }) {
     setGuardian({
       name: data.guardian_name || "",
       phone: data.guardian_phone || "",
-      email: data.guardian_email || "",
+      relationship: data.guardian_relationship || "",
     });
 
     setLoading(false);
@@ -163,13 +163,23 @@ export default function EditProfileModal({ onClose }) {
               }
             />
 
-            <label>Guardian Email</label>
-            <input
-              value={guardian.email}
+            <label>Relationship</label>
+            <select
+              value={guardian.relationship}
               onChange={(e) =>
-                setGuardian({ ...guardian, email: e.target.value })
+                setGuardian({ ...guardian, relationship: e.target.value })
               }
-            />
+            >
+              <option value="">Select</option>
+              <option>Father</option>
+              <option>Mother</option>
+              <option>Brother</option>
+              <option>Sister</option>
+              <option>Uncle</option>
+              <option>Aunt</option>
+              <option>Grandparent</option>
+              <option>Other</option>
+            </select>
           </div>
         )}
 
