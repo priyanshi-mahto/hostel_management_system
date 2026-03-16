@@ -37,7 +37,7 @@ export const updateProfile =async (req,res)=>{
         await updateStudentProfile(req.user.user_id,req.body);
         res.json({message:"Profile updated successfully"});
     }catch(err){
-        res.status(500).json({error:err.message});
+        res.status(err.statusCode || 500).json({error:err.message});
     }
 };
 

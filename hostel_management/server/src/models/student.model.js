@@ -21,12 +21,25 @@ export const getStudentProfileByUserId = async (userId) => {
         s.roll_no,
         s.profile_image,
         s.blood_group,
+        s.house_no,
+        s.street,
+        s.area,
+        s.city,
+        s.state,
+        s.pincode,
 
         u.email,
 
+        g.guardian_id,
         g.name AS guardian_name,
         g.phone AS guardian_phone,
         g.relationship AS guardian_relationship,
+        g.house_no AS guardian_house_no,
+        g.street AS guardian_street,
+        g.area AS guardian_area,
+        g.city AS guardian_city,
+        g.state AS guardian_state,
+        g.pincode AS guardian_pincode,
 
         h.hostel_name,
         r.unit,
@@ -44,7 +57,40 @@ export const getStudentProfileByUserId = async (userId) => {
     );
 
     console.log("[MODEL] Query result:", rows);
-    return rows[0];
+    if (!rows.length) return null;
+
+    const guardiansMap = new Map();
+    rows.forEach((row) => {
+      if (!row.guardian_id || guardiansMap.has(row.guardian_id)) return;
+      guardiansMap.set(row.guardian_id, {
+        guardian_id: row.guardian_id,
+        name: row.guardian_name || "",
+        phone: row.guardian_phone || "",
+        relationship: row.guardian_relationship || "",
+        house_no: row.guardian_house_no || "",
+        street: row.guardian_street || "",
+        area: row.guardian_area || "",
+        city: row.guardian_city || "",
+        state: row.guardian_state || "",
+        pincode: row.guardian_pincode || "",
+      });
+    });
+    const guardians = Array.from(guardiansMap.values());
+
+    const firstGuardian = guardians[0] || null;
+    return {
+      ...rows[0],
+      guardian_name: firstGuardian?.name || "",
+      guardian_phone: firstGuardian?.phone || "",
+      guardian_relationship: firstGuardian?.relationship || "",
+      guardian_house_no: firstGuardian?.house_no || "",
+      guardian_street: firstGuardian?.street || "",
+      guardian_area: firstGuardian?.area || "",
+      guardian_city: firstGuardian?.city || "",
+      guardian_state: firstGuardian?.state || "",
+      guardian_pincode: firstGuardian?.pincode || "",
+      guardians,
+    };
   } catch (err) {
     console.error("[MODEL] Error in getStudentProfileByUserId:", err.message);
     throw err;
@@ -54,50 +100,92 @@ export const getStudentProfileByUserId = async (userId) => {
 
 
 export const updateStudentProfile = async (userId, data) => {
-  const { profile, guardian } = data;
+  const { profile, guardians, guardian } = data;
+
+  const [studentRows] = await pool.query(
+    "SELECT student_id FROM student WHERE user_id=?",
+    [userId]
+  );
+
+  if (!studentRows.length) return;
+  const studentId = studentRows[0].student_id;
 
   // Update student profile
   if (profile) {
-    const { gender, DOB, blood_group, phone } = profile;
+    const { name, gender, DOB, blood_group, phone, address } = profile;
     
     await pool.query(
-      "UPDATE student SET gender=?, DOB=?, blood_group=?, phone=? WHERE user_id=?",
-      [gender || null, DOB || null, blood_group || null, phone || null, userId]
+      "UPDATE student SET name=?, gender=?, DOB=?, blood_group=?, phone=? WHERE user_id=?",
+      [name || null, gender || null, DOB || null, blood_group || null, phone || null, userId]
     );
+
+    // Update address if provided
+    if (address) {
+      const parts = address.split(',').map(p => p.trim());
+      const house_no = parts[0] || null;
+      const street = parts[1] || null;
+      const area = parts[2] || null;
+      const city = parts[3] || null;
+      const state = parts[4] || null;
+      const pincode = parts[5] || null;
+
+      await pool.query(
+        "UPDATE student SET house_no=?, street=?, area=?, city=?, state=?, pincode=? WHERE user_id=?",
+        [house_no, street, area, city, state, pincode, userId]
+      );
+    }
   }
 
-  // Update guardian information
-  if (guardian && guardian.name) {
-    const { name, phone: guardianPhone, relationship } = guardian;
-    
-    // Get student_id first
-    const [studentRows] = await pool.query(
-      "SELECT student_id FROM student WHERE user_id=?",
-      [userId]
-    );
-    
-    if (studentRows.length > 0) {
-      const studentId = studentRows[0].student_id;
-      
-      // Check if guardian already exists
-      const [guardianRows] = await pool.query(
-        "SELECT guardian_id FROM guardian WHERE student_id=?",
-        [studentId]
+  // Update guardian information (supports multiple guardians)
+  const hasGuardianPayload = Array.isArray(guardians) || guardian !== undefined;
+  if (hasGuardianPayload) {
+    const guardianList = Array.isArray(guardians)
+      ? guardians
+      : guardian
+      ? [guardian]
+      : [];
+
+    const fatherCount = guardianList.filter(
+      (g) => g?.relationship?.trim() === "Father"
+    ).length;
+    const motherCount = guardianList.filter(
+      (g) => g?.relationship?.trim() === "Mother"
+    ).length;
+
+    if (fatherCount > 1) {
+      const error = new Error("Only one guardian can have the relationship Father.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (motherCount > 1) {
+      const error = new Error("Only one guardian can have the relationship Mother.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    await pool.query("DELETE FROM guardian WHERE student_id=?", [studentId]);
+
+    for (const g of guardianList) {
+      const name = g?.name?.trim();
+      const phone = g?.phone?.trim() || null;
+      const relationship = g?.relationship?.trim() || null;
+      const address = g?.address || "";
+
+      if (!name && !phone && !relationship && !address) continue;
+
+      const parts = address.split(",").map((p) => p.trim());
+      const house_no = parts[0] || g?.house_no || null;
+      const street = parts[1] || g?.street || null;
+      const area = parts[2] || g?.area || null;
+      const city = parts[3] || g?.city || null;
+      const state = parts[4] || g?.state || null;
+      const pincode = parts[5] || g?.pincode || null;
+
+      await pool.query(
+        "INSERT INTO guardian (name, phone, relationship, house_no, street, area, city, state, pincode, student_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [name || null, phone, relationship, house_no, street, area, city, state, pincode, studentId]
       );
-      
-      if (guardianRows.length > 0) {
-        // Update existing guardian
-        await pool.query(
-          "UPDATE guardian SET name=?, phone=?, relationship=? WHERE student_id=?",
-          [name, guardianPhone || null, relationship || null, studentId]
-        );
-      } else {
-        // Create new guardian
-        await pool.query(
-          "INSERT INTO guardian (name, phone, relationship, student_id) VALUES (?, ?, ?, ?)",
-          [name, guardianPhone || null, relationship || null, studentId]
-        );
-      }
     }
   }
 };

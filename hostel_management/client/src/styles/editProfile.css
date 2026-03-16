@@ -14,6 +14,8 @@
   max-width: 420px;
   border-radius: 16px;
   padding: 15px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -23,15 +25,17 @@
 }
 
 .tabs button {
-  background: none;
-  border: none;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
   font-weight: 600;
   margin-right: 10px;
-  padding-bottom: 6px;
-  border-bottom: 3px solid transparent;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .tabs .active {
+  background: #dbeafe;
   border-color: #1d4ed8;
   color: #1d4ed8;
 }
@@ -90,4 +94,69 @@
   border: none;
   padding: 10px;
   border-radius: 20px;
+}
+
+.switch-section-btn {
+  margin-top: 8px;
+  align-self: flex-start;
+  background: #eef2ff;
+  color: #1e40af;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guardian-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  margin-bottom: 12px;
+}
+
+.guardian-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.guardian-card-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #111827;
+}
+
+.remove-guardian-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.add-guardian-btn {
+  align-self: flex-start;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.form-error {
+  margin: 10px 0 0;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
 }

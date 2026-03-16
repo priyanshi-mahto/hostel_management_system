@@ -20,7 +20,23 @@ export default function MyProfile() {
     setData(res);
   };
 
+  const handleCloseEdit = async () => {
+    setEditOpen(false);
+    await loadProfile();
+  };
+
   if (!data) return <p>Loading...</p>;
+
+  const studentAddress = [
+    data.house_no,
+    data.street,
+    data.area,
+    data.city,
+    data.state,
+    data.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <>
@@ -67,18 +83,60 @@ export default function MyProfile() {
 
         {/* PERSONAL INFO */}
         <Section title="Personal Information">
+          <Info label="Full Name" value={data.name} />
           <Info label="Email Address" value={data.email} />
           <Info label="Phone Number" value={data.phone} />
           <Info label="Roll Number" value={data.roll_no} />
           <Info label="Date of Birth" value={data.DOB} />
           <Info label="Gender" value={data.gender} />
+          <Info label="Blood Group" value={data.blood_group} />
+          <Info label="Address" value={studentAddress || "Not provided"} />
         </Section>
 
         {/* GUARDIAN INFO */}
         <Section title="Guardian Information">
-          <Info label="Guardian Name" value={data.guardian_name} />
-          <Info label="Guardian Phone" value={data.guardian_phone} />
-          <Info label="Guardian Relationship" value={data.guardian_relationship} />
+          {Array.isArray(data.guardians) && data.guardians.length > 0 ? (
+            data.guardians.map((guardian, index) => (
+              <div key={guardian.guardian_id || index} className="guardian-profile-card">
+                <h5 className="guardian-profile-title">Guardian {index + 1}</h5>
+                <Info label="Name" value={guardian.name} />
+                <Info label="Phone" value={guardian.phone} />
+                <Info label="Relationship" value={guardian.relationship} />
+                <Info
+                  label="Address"
+                  value={[
+                    guardian.house_no,
+                    guardian.street,
+                    guardian.area,
+                    guardian.city,
+                    guardian.state,
+                    guardian.pincode,
+                  ]
+                    .filter(Boolean)
+                    .join(", ") || "Not provided"}
+                />
+              </div>
+            ))
+          ) : (
+            <>
+              <Info label="Guardian Name" value={data.guardian_name} />
+              <Info label="Guardian Phone" value={data.guardian_phone} />
+              <Info label="Guardian Relationship" value={data.guardian_relationship} />
+              <Info
+                label="Guardian Address"
+                value={[
+                  data.guardian_house_no,
+                  data.guardian_street,
+                  data.guardian_area,
+                  data.guardian_city,
+                  data.guardian_state,
+                  data.guardian_pincode,
+                ]
+                  .filter(Boolean)
+                  .join(", ") || "Not provided"}
+              />
+            </>
+          )}
         </Section>
 
         {/* HOSTEL INFO */}
@@ -90,7 +148,7 @@ export default function MyProfile() {
 
       </div>
 
-      {editOpen && <EditProfile onClose={() => setEditOpen(false)} />}
+      {editOpen && <EditProfile onClose={handleCloseEdit} />}
     </>
   );
 }
