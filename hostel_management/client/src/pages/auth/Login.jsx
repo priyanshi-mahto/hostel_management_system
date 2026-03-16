@@ -15,6 +15,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("Submitting login with:", { email, password });
+
     try {
       setLoading(true);
       setError("");
@@ -23,6 +25,8 @@ export default function Login() {
         email,
         password,
       });
+
+      console.log("Login response:", data);
 
       // Save token
       localStorage.setItem("token", data.token);
@@ -38,7 +42,10 @@ export default function Login() {
       }
 
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      console.log("Login error:", err.response?.data);
+      setError(
+        err.response?.data?.message || err.response?.data?.error || "Login failed"
+      );
     } finally {
       setLoading(false);
     }

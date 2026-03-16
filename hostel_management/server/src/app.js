@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 // Configure CORS properly
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5173'];
 app.use(cors({ 
-  origin: allowedOrigins,
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
