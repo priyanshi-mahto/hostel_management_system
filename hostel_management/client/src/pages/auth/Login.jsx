@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { loginUser } from "../../api/auth.api";
+import { loginUser, getMe } from "../../api/auth.api";
 import "../../styles/login.css";
 
 export default function Login() {
@@ -31,6 +31,14 @@ export default function Login() {
       // Save token
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
+
+      // Fetch and store user profile so Header/Sidebar can read it immediately
+      try {
+        const profile = await getMe();
+        localStorage.setItem("user", JSON.stringify(profile));
+      } catch (err) {
+        console.error("Failed to fetch profile after login", err);
+      }
 
       // Redirect by role
       if (data.role === "STUDENT") {

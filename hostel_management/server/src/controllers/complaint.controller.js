@@ -3,7 +3,7 @@ import{
     updateComplaintStatus,
     addComplaintFeedback
 } from "../models/complaint.model.js";
-import { findStudentByUserId } from "../models/student.model.js";
+import { findStudentByUserId, getStudentComplaints } from "../models/student.model.js";
 
 export const fetchAllComplaints = async(req,res)=>{
     try{
@@ -40,5 +40,17 @@ export const submitFeedback = async(req,res)=>{
         res.status(201).json({message:"Feedback submitted"});
     }catch(err){
         res.status(500).json({error:err.message});
+    }
+};
+
+export const fetchStudentComplaints = async (req, res) => {
+    try {
+        const student = await findStudentByUserId(req.user.user_id);
+        if (!student) return res.status(404).json({ message: "Student not found" });
+
+        const complaints = await getStudentComplaints(student.student_id);
+        res.json(complaints);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };

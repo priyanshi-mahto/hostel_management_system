@@ -1,8 +1,9 @@
 import express from "express";
-import {getProfile,updateProfile,raiseComplaint,getComplaints,applyLeaveController,getLeaves,createVisitingRequest, getDashboard} from "../controllers/student.controller.js";
+import {getProfile,updateProfile,raiseComplaint,getComplaints,applyLeaveController,getLeaves,createVisitingRequest, getDashboard,uploadIDCard, getIDCard} from "../controllers/student.controller.js";
 
 import {protect} from "../middleware/auth.middleware.js";
 import {allowRoles} from "../middleware/role.middleware.js";
+import { upload } from "../middleware/upload.middleware.js";
 
 const router=express.Router();
 
@@ -21,5 +22,18 @@ router.post("/leave", applyLeaveController);
 router.get("/leave", getLeaves);
 
 router.post("/visiting-request", createVisitingRequest);
+
+router.get("/id-card", getIDCard);
+
+
+router.post(
+  "/upload-id-card",
+  protect,
+  upload.fields([
+    { name: "front", maxCount: 1 },
+    { name: "back", maxCount: 1 }
+  ]),
+  uploadIDCard
+);
 
 export default router;

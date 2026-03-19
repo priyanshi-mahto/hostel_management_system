@@ -2,7 +2,6 @@ import pool from "../config/db.js";
 import {
   findStudentByUserId,
   updateStudentProfile,
-  getStudentComplaints,
   getRoomAllocation,
   getHostelInfo,
   getRoommatesByRoom,
@@ -12,7 +11,10 @@ import {
   getGlobalLostItemsCount,
   getGlobalClaimedItemsCount,
   getPendingComplaintsCount,
+  getStudentComplaints,
   getStudentProfileByUserId,
+  saveStudentIDCard,
+  getStudentIDCardByStudentId,
 } from "../models/student.model.js";
 import {createComplaint} from "../models/complaint.model.js";
 import {applyLeave, getLeavesByStudent} from "../models/leave.model.js";
@@ -166,6 +168,59 @@ export const getDashboard = async (req, res) => {
 
     res.json({ student, room, stats });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const uploadIDCard = async (req, res) => {
+  try {
+
+    const student = await findStudentByUserId(req.user.user_id);
+    if (!student) return res.status(404).json({ message: "Student not found" });
+
+    const student_id = student.student_id;
+
+    // Prevent re-upload if already verified
+    const existing = await getStudentIDCardByStudentId(student_id);
+    if (existing && existing.status === "VERIFIED") {
+      return res.status(400).json({ message: "ID card already verified; re-upload not allowed" });
+    }
+
+    const front = req.files?.front?.[0]?.filename;
+    const back = req.files?.back?.[0]?.filename;
+
+    if (!front || !back) {
+      return res.status(400).json({
+        message: "Both front and back images are required"
+      });
+    }
+
+    await saveStudentIDCard(student_id, front, back);
+
+    res.json({
+      message: "ID card uploaded successfully",
+      front,
+      back
+    });
+
+  } catch (err) {
+    console.error("ID CARD UPLOAD ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getIDCard = async (req, res) => {
+  try {
+    const student = await findStudentByUserId(req.user.user_id);
+    if (!student) return res.status(404).json({ message: "Student not found" });
+
+    const idcard = await getStudentIDCardByStudentId(student.student_id);
+    if (!idcard) return res.status(404).json({ message: "No ID card uploaded" });
+
+    res.json(idcard);
+  } catch (err) {
+    console.error("GET ID CARD ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 };

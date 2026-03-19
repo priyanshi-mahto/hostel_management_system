@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import {createUser, findUserByEmail, findUserById, updateUserPassword} from "../models/user.model.js";
+import { getStudentProfileByUserId } from "../models/student.model.js";
 
 const generateToken =(user)=>{
     return jwt.sign(
@@ -60,7 +61,22 @@ export const login = async (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  res.json(req.user);
+  try {
+    const tokenUser = req.user;
+    if (!tokenUser) return res.status(401).json({ message: "Not authorized" });
+
+    if (tokenUser.role === "STUDENT") {
+      const profile = await getStudentProfileByUserId(tokenUser.user_id);
+      if (!profile) return res.status(404).json({ message: "Profile not found" });
+      return res.json(profile);
+    }
+
+    // For other roles, return minimal token info
+    return res.json(tokenUser);
+  } catch (err) {
+    console.error("GETME ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 export const changePassword = async (req, res) => {

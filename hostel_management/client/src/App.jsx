@@ -21,11 +21,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/auth/Login";
 import ChangePassword from "./components/ChangePassword";
+import IDCard from "./pages/student/IDCard";
 // import Register from "./pages/auth/Register";
 
 import StudentDashboard from "./pages/student/StudentDashboard";
 import MyProfile from "./pages/student/MyProfile";
 import EditProfile from "./pages/student/EditProfile";
+import Complaints from "./pages/student/Complaints";
 // import WardenDashboard from "./pages/warden/WardenDashboard";
 // import AdminDashboard from "./pages/admin/AdminDashboard";
 
@@ -60,6 +62,15 @@ export default function AppRouter() {
         />
 
         <Route
+          path="/student/complaints"
+          element={
+            <ProtectedRoute role="STUDENT">
+              <Complaints />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
          path="/student/change-password"
          element={
           <ProtectedRoute role="STUDENT">
@@ -77,6 +88,14 @@ export default function AppRouter() {
          }
         />
 
+        <Route
+  path="/student/id-card"
+  element={
+    <ProtectedRoute role="STUDENT">
+      <IDCard />
+    </ProtectedRoute>
+  }
+/>
         {/* Warden */}
         {/* <Route
           path="/warden"

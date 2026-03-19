@@ -272,3 +272,26 @@ export const getPendingComplaintsCount = async (studentId) => {
   );
   return result?.cnt || 0;
 };
+
+export const saveStudentIDCard = async (student_id, front, back) => {
+
+  const query = `
+    INSERT INTO student_id_card (student_id, id_front_image, id_back_image)
+    VALUES (?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      id_front_image = VALUES(id_front_image),
+      id_back_image = VALUES(id_back_image),
+      verification_status = 'PENDING'
+  `;
+
+  const [result] = await pool.query(query, [student_id, front, back]);
+  return result;
+};
+
+export const getStudentIDCardByStudentId = async (student_id) => {
+  const [rows] = await pool.query(
+    `SELECT id_front_image AS front, id_back_image AS back, verification_status AS status FROM student_id_card WHERE student_id = ?`,
+    [student_id]
+  );
+  return rows[0] || null;
+};

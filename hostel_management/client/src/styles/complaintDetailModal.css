@@ -1,0 +1,146 @@
+/* DETAILS MODAL */
+.details-modal {
+  width: 95%;
+  max-width: 420px;
+  background: white;
+  border-radius: 20px;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+/* HEADER */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+}
+
+.details-header h2 {
+  color: #2b6cb0;
+  font-size: 18px;
+}
+
+.close-btn {
+  border: 2px solid #2b6cb0;
+  background: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: #2b6cb0;
+  cursor: pointer;
+}
+
+/* BODY */
+.details-body {
+  padding: 16px;
+}
+
+/* TOP INFO */
+.top-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.complaint-id {
+  background: #eef2f7;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.status.resolved {
+  background: #bbf7d0;
+}
+
+/* META */
+.meta-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  background: #e0e7ff;
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.date {
+  color: #666;
+}
+
+/* FEEDBACK */
+.feedback-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 14px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+/* CARD */
+.detail-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-title.green {
+  color: #16a34a;
+}
+
+.card-title.blue {
+  color: #2563eb;
+}
+
+/* USER */
+.user-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.user-row img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+/* RESOLVED TIME */
+.resolved-time {
+  background: #dcfce7;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+/* INFO */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+/* DESCRIPTION */
+.desc {
+  color: #444;
+}
