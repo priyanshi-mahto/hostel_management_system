@@ -1,0 +1,93 @@
+body {
+  font-family: Arial;
+  background: #f5f7fb;
+}
+
+.container {
+  padding: 15px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu {
+  font-size: 22px;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.card {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tabs button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+}
+
+.tabs .active {
+  background: #1e5aa8;
+  color: white;
+}
+
+.search {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.item-card {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.status.active {
+  background: #d4f4dd;
+  color: green;
+}
+
+.status.claimed {
+  background: #e0e0e0;
+}
+
+.desc {
+  margin-top: 8px;
+  background: #f0f2f5;
+  padding: 8px;
+  border-radius: 8px;
+}

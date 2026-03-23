@@ -12,7 +12,7 @@ import adminRoutes from "./routes/admin.route.js";
 import complaintRoutes from "./routes/complaint.route.js";
 import leaveRoutes from "./routes/leave.route.js"
 import { errorHandler } from "./middleware/error.middleware.js";
-
+import lostFoundRoutes from "./routes/lostFound.route.js";
 const app = express();
 
 // Request logger
@@ -38,7 +38,8 @@ app.use("/api/warden",wardenRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/complaints",complaintRoutes);
 app.use("/api/leave",leaveRoutes);
-app.use(errorHandler);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/items", lostFoundRoutes);
+app.use(errorHandler);
 
 export default app;

@@ -28,6 +28,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import MyProfile from "./pages/student/MyProfile";
 import EditProfile from "./pages/student/EditProfile";
 import Complaints from "./pages/student/Complaints";
+import LostFound from "./pages/student/LostFound";
 // import WardenDashboard from "./pages/warden/WardenDashboard";
 // import AdminDashboard from "./pages/admin/AdminDashboard";
 
@@ -68,6 +69,15 @@ export default function AppRouter() {
           element={
             <ProtectedRoute role="STUDENT">
               <Complaints />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student/lost-found"
+          element={
+            <ProtectedRoute role="STUDENT">
+              <LostFound />
             </ProtectedRoute>
           }
         />
