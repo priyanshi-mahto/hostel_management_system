@@ -1,0 +1,141 @@
+.visitor-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  margin-bottom: 15px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #1e5fa8;
+  color: white;
+}
+
+.filter-box {
+  background: #f1f3f6;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.status-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.status-tabs button {
+  background: #ddd;
+}
+
+.status-tabs .active {
+  background: #1e5fa8;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 50px;
+  color: #555;
+}
+
+.empty-state .icon {
+  font-size: 40px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  width: 350px;
+  border-radius: 12px;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 15px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal.large {
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section {
+  margin-top: 15px;
+}
+
+.section input,
+.section textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+}
+
+.section textarea {
+  height: 100px;
+}
+
+.checkbox {
+  display: block;
+  margin: 5px 0;
+}
+
+.empty-box {
+  background: #f3f5f7;
+  padding: 12px;
+  border-radius: 8px;
+  color: #666;
+}
+
+small {
+  color: gray;
+}

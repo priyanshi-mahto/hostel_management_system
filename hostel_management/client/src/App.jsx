@@ -32,6 +32,8 @@ import Complaints from "./pages/student/Complaints";
 // import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import VisitorRequests from "./pages/student/VisitorRequests";
+
 
 export default function AppRouter() {
   return (
@@ -96,6 +98,12 @@ export default function AppRouter() {
     </ProtectedRoute>
   }
 />
+        <Route
+         path="/student/visitors"
+          element={
+          <ProtectedRoute role="STUDENT">
+           <VisitorRequests />
+            </ProtectedRoute>} />
         {/* Warden */}
         {/* <Route
           path="/warden"

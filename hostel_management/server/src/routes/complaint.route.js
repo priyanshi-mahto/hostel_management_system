@@ -1,5 +1,5 @@
 import express from "express";
-import {fetchAllComplaints, changeComplaintStatus, submitFeedback} from "../controllers/complaint.controller.js";
+import {fetchAllComplaints, changeComplaintStatus, submitFeedback,fetchStudentComplaints} from "../controllers/complaint.controller.js";
 
 import {protect} from "../middleware/auth.middleware.js";
 import {allowRoles} from "../middleware/role.middleware.js";
