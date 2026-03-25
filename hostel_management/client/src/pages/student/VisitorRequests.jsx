@@ -5,18 +5,42 @@ import Sidebar from "../../components/Sidebar";
 import VisitorProfileModal from "../../components/VisitorProfileModal";
 import ManageProfilesModal from "../../components/ManageProfilesModal";
 import CreateRequestModal from "../../components/CreateRequestModal";
-import { useAuth } from "../../context/AuthContext";
+import { getVisitorRequests } from "../../api/visitor.api";
 
 const VisitorRequests = () => {
-     const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-   const [student, setStudent] = useState(null);
+  const [student, setStudent] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("All");
 
   const [showFilters, setShowFilters] = useState(false);
   const [showAddProfile, setShowAddProfile] = useState(false);
   const [showManageProfiles, setShowManageProfiles] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-  const { user } = useAuth();
+
+  React.useEffect(() => {
+    try {
+      setStudent(JSON.parse(localStorage.getItem("user") || "null"));
+    } catch (err) {
+      console.error("Failed to parse stored user", err);
+    }
+    loadRequests();
+  }, []);
+
+  const loadRequests = async () => {
+    try {
+      const data = await getVisitorRequests();
+      setRequests(data);
+    } catch (err) {
+      console.error(err);
+      setRequests([]);
+    }
+  };
+
+  const filteredRequests = requests.filter((request) =>
+    activeFilter === "All" ? true : request.status === activeFilter.toUpperCase()
+  );
 
   return (
     <>
@@ -48,23 +72,41 @@ const VisitorRequests = () => {
         <div className="filter-box">
           <p>Filter by Status:</p>
           <div className="status-tabs">
-            <button className="active">All</button>
-            <button>Pending</button>
-            <button>Approved</button>
-            <button>Rejected</button>
+            {['All', 'Pending', 'Approved', 'Rejected'].map((status) => (
+              <button
+                key={status}
+                className={activeFilter === status ? "active" : ""}
+                onClick={() => setActiveFilter(status)}
+              >
+                {status}
+              </button>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Empty State */}
-      <div className="empty-state">
-        <div className="icon">👥</div>
-        <h3>No Visitor Requests</h3>
-        <p>
-          You haven't made any visitor accommodation requests yet. Create a new
-          request to get started.
-        </p>
-      </div>
+      {/* Requests */}
+      {filteredRequests.length === 0 ? (
+        <div className="empty-state">
+          <div className="icon">👥</div>
+          <h3>No Visitor Requests</h3>
+          <p>
+            You haven't made any visitor accommodation requests yet. Create a new
+            request to get started.
+          </p>
+        </div>
+      ) : (
+        <div className="section">
+          {filteredRequests.map((request) => (
+            <div key={request.request_id} className="empty-box">
+              <strong>{request.visitors}</strong>
+              <p>Status: {request.status}</p>
+              <p>From: {request.from_date?.slice(0, 10)}</p>
+              <p>To: {request.to_date?.slice(0, 10)}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="pagination">
@@ -75,7 +117,7 @@ const VisitorRequests = () => {
 
       {/* Modals */}
       {showAddProfile && (
-        <VisitorProfileModal onClose={() => setShowAddProfile(false)} />
+        <VisitorProfileModal onClose={() => setShowAddProfile(false)} onSaved={loadRequests} />
       )}
 
       {showManageProfiles && (
@@ -83,11 +125,8 @@ const VisitorRequests = () => {
       )}
 
       {showCreate && (
-  <CreateRequestModal
-    onClose={() => setShowCreate(false)}
-    // studentId={user?.student_id} 
-  />
-)}
+        <CreateRequestModal onClose={() => setShowCreate(false)} onSaved={loadRequests} />
+      )}
     </div>
     </>
   );

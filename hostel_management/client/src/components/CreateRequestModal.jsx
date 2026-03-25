@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { createVisitorRequest, getVisitorProfiles } from "../api/visitor.api";
 
-const CreateRequestModal = ({ onClose, studentId }) => {
+const CreateRequestModal = ({ onClose, onSaved }) => {
   const [profiles, setProfiles] = useState([]);
   const [selectedVisitors, setSelectedVisitors] = useState([]);
   const [form, setForm] = useState({
@@ -9,22 +9,21 @@ const CreateRequestModal = ({ onClose, studentId }) => {
     to_date: "",
     reason: "",
   });
+  const [error, setError] = useState("");
 
   /* ------------------ FETCH PROFILES ------------------ */
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await axios.get(
-          `/api/visitor/profile/${studentId}`
-        );
-        setProfiles(res.data);
+        const res = await getVisitorProfiles();
+        setProfiles(res);
       } catch (err) {
         console.error(err);
       }
     };
 
     fetchProfiles();
-  }, [studentId]);
+  }, []);
 
   /* ------------------ HANDLE INPUT ------------------ */
   const handleChange = (e) => {
@@ -43,17 +42,23 @@ const CreateRequestModal = ({ onClose, studentId }) => {
   /* ------------------ SUBMIT ------------------ */
   const handleSubmit = async () => {
     try {
-      await axios.post("/api/visitor/request", {
-        student_id: studentId,
+      if (!form.from_date || !form.to_date || !form.reason || selectedVisitors.length === 0) {
+        setError("Please select visitors and fill all request fields.");
+        return;
+      }
+
+      setError("");
+
+      await createVisitorRequest({
         ...form,
         visitor_ids: selectedVisitors,
       });
 
-      alert("Request submitted!");
+      onSaved && (await onSaved());
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Error submitting request");
+      setError(err.response?.data?.error || "Error submitting request");
     }
   };
 
@@ -80,6 +85,7 @@ const CreateRequestModal = ({ onClose, studentId }) => {
               <label key={p.visitor_id} className="checkbox">
                 <input
                   type="checkbox"
+                  checked={selectedVisitors.includes(p.visitor_id)}
                   onChange={() => toggleVisitor(p.visitor_id)}
                 />
                 {p.name} ({p.relation})
@@ -120,6 +126,8 @@ const CreateRequestModal = ({ onClose, studentId }) => {
             onChange={handleChange}
           />
         </div>
+
+        {error && <p className="form-error">{error}</p>}
 
         {/* Actions */}
         <div className="modal-actions">
