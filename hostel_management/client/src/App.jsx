@@ -29,6 +29,17 @@ import MyProfile from "./pages/student/MyProfile";
 import EditProfile from "./pages/student/EditProfile";
 import Complaints from "./pages/student/Complaints";
 import LostFound from "./pages/student/LostFound";
+
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import StudentManagement from "./pages/admin/StudentManagement";
+import RoomAllocation from "./pages/admin/RoomAllocation";
+import ComplaintsManagement from "./pages/admin/ComplaintsManagement";
+import AdminVisitorRequests from "./pages/admin/VisitorRequests";
+import AdminLostFound from "./pages/admin/LostFound";
+import WardenStaffManagement from "./pages/admin/WardenStaffManagement";
+import IDCardVerification from "./pages/admin/IDCardVerification";
+import Notifications from "./pages/admin/Notifications";
 // import WardenDashboard from "./pages/warden/WardenDashboard";
 // import AdminDashboard from "./pages/admin/AdminDashboard";
 
