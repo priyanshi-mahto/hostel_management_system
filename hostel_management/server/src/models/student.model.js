@@ -15,6 +15,7 @@ export const getStudentProfileByUserId = async (userId) => {
       SELECT
         s.student_id,
         s.name,
+        s.hostel_id,
         s.DOB,
         s.gender,
         s.phone,
@@ -50,7 +51,7 @@ export const getStudentProfileByUserId = async (userId) => {
       LEFT JOIN guardian g ON g.student_id = s.student_id
       LEFT JOIN room_allocation ra ON ra.student_id = s.student_id AND ra.to_date IS NULL
       LEFT JOIN room r ON r.room_id = ra.room_id
-      LEFT JOIN hostel h ON h.hostel_id = r.hostel_id
+      LEFT JOIN hostel h ON h.hostel_id = COALESCE(s.hostel_id, r.hostel_id)
       WHERE s.user_id = ?
       `,
       [userId]
@@ -198,6 +199,81 @@ export const getStudentComplaints = async (studentId) => {
   return rows;
 };
 
+export const getStudentsByHostelId = async (hostelId) => {
+  const [rows] = await pool.query(
+    `SELECT
+      s.student_id,
+      s.name,
+      s.roll_no,
+      s.gender,
+      s.blood_group,
+      s.phone,
+      s.DOB,
+      s.house_no,
+      s.street,
+      s.area,
+      s.city,
+      s.state,
+      s.pincode,
+      CASE
+        WHEN s.house_no IS NOT NULL AND s.street IS NOT NULL AND s.city IS NOT NULL THEN 1
+        ELSE 0
+      END AS has_address,
+      u.email,
+      r.room_no,
+      CASE
+        WHEN ra.room_id IS NULL THEN 'Inactive'
+        ELSE 'Active'
+      END AS status,
+      (SELECT COUNT(*) FROM guardian WHERE student_id = s.student_id) AS guardian_count,
+      GROUP_CONCAT(CONCAT(g.name, ' (', g.relationship, ') ', COALESCE(g.phone, 'N/A')) SEPARATOR ' | ') AS guardian_info
+    FROM student s
+    INNER JOIN users u ON u.user_id = s.user_id
+    LEFT JOIN room_allocation ra
+      ON ra.student_id = s.student_id
+      AND ra.to_date IS NULL
+    LEFT JOIN room r ON r.room_id = ra.room_id
+    LEFT JOIN guardian g ON g.student_id = s.student_id
+    WHERE s.hostel_id = ?
+       OR EXISTS (
+      SELECT 1
+      FROM room_allocation hra
+      INNER JOIN room hr ON hr.room_id = hra.room_id
+      WHERE hra.student_id = s.student_id
+        AND hra.to_date IS NULL
+        AND hr.hostel_id = ?
+    )
+    GROUP BY s.student_id, s.name, s.roll_no, s.gender, s.blood_group, s.phone, s.DOB, s.house_no, s.street, s.area, s.city, s.state, s.pincode, u.email, r.room_no, ra.room_id, s.hostel_id
+    ORDER BY s.name ASC`,
+    [hostelId, hostelId]
+  );
+
+  return rows;
+};
+
+export const isStudentAssignedToHostel = async (studentId, hostelId) => {
+  const [rows] = await pool.query(
+    `SELECT s.student_id
+     FROM student s
+     WHERE s.student_id = ?
+       AND (
+         s.hostel_id = ?
+         OR EXISTS (
+           SELECT 1
+           FROM room_allocation ra
+           INNER JOIN room r ON r.room_id = ra.room_id
+           WHERE ra.student_id = s.student_id
+             AND ra.to_date IS NULL
+             AND r.hostel_id = ?
+         )
+       )
+     LIMIT 1`,
+    [studentId, hostelId, hostelId]
+  );
+
+  return Boolean(rows[0]);
+};
+
 export const getRoomAllocation = async (studentId) => {
   const [[result]] = await pool.query(
     `SELECT r.room_id, r.room_no, r.hostel_id
@@ -281,7 +357,9 @@ export const saveStudentIDCard = async (student_id, front, back) => {
     ON DUPLICATE KEY UPDATE
       id_front_image = VALUES(id_front_image),
       id_back_image = VALUES(id_back_image),
-      verification_status = 'PENDING'
+      verification_status = 'PENDING',
+      rejection_reason = NULL,
+      verified_by = NULL
   `;
 
   const [result] = await pool.query(query, [student_id, front, back]);
@@ -290,7 +368,13 @@ export const saveStudentIDCard = async (student_id, front, back) => {
 
 export const getStudentIDCardByStudentId = async (student_id) => {
   const [rows] = await pool.query(
-    `SELECT id_front_image AS front, id_back_image AS back, verification_status AS status FROM student_id_card WHERE student_id = ?`,
+    `SELECT
+      id_front_image AS front,
+      id_back_image AS back,
+      verification_status AS status,
+      rejection_reason
+     FROM student_id_card
+     WHERE student_id = ?`,
     [student_id]
   );
   return rows[0] || null;

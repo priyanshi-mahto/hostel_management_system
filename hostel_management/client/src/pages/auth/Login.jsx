@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { loginUser, getMe } from "../../api/auth.api";
+import { useAuth } from "../../context/AuthContext";
 import "../../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,14 +30,25 @@ export default function Login() {
 
       console.log("Login response:", data);
 
-      // Save token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      // Save token + update AuthContext so ProtectedRoute sees the user
+      login(data.token, data.role);
 
       // Fetch and store user profile so Header/Sidebar can read it immediately
       try {
         const profile = await getMe();
         localStorage.setItem("user", JSON.stringify(profile));
+
+        // ── ADD THIS: save hostel-scoped session for admin/warden ──
+  if (data.role === "HOSTEL_ADMIN" || data.role === "WARDEN") {
+    localStorage.setItem("admin_session", JSON.stringify({
+      userId:     profile.user_id,
+      name:       profile.name,
+      role:       data.role,
+      hostelId:   profile.hostel_id,    // your getMe() must return this
+      hostelName: profile.hostel_name,  // your getMe() must return this
+      hostelType: profile.hostel_type,  // "Boys" or "Girls"
+    }));
+  }
       } catch (err) {
         console.error("Failed to fetch profile after login", err);
       }

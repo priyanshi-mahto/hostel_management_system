@@ -99,3 +99,138 @@
 //     </div>
 //   );
 // }
+export default function ComplaintDetailsModal({ data, onClose }) {
+  if (!data) return null;
+
+  const statusStyles = {
+    Resolved: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    Pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    "In Progress": "bg-blue-100 text-blue-700 border-blue-200",
+  };
+  const statusClass = statusStyles[data.status] || "bg-gray-100 text-gray-600 border-gray-200";
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-emerald-50 shrink-0">
+          <div className="flex-1 min-w-0 pr-4">
+            <h2 className="text-lg font-bold text-gray-800 truncate">{data.title}</h2>
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className="text-xs text-gray-400 font-mono">{data.id}</span>
+              <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${statusClass}`}>
+                {data.status || "Resolved"}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {/* Meta */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium px-3 py-1 bg-teal-50 text-teal-700 rounded-full border border-teal-100">
+              {data.category}
+            </span>
+            <span className="text-xs text-gray-400">📅 {data.date}</span>
+            <button className="ml-auto text-xs font-medium text-yellow-600 hover:text-yellow-700 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100 transition-colors">
+              ⭐ Leave Feedback
+            </button>
+          </div>
+
+          {/* Resolved By */}
+          {data.resolver_name && (
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 space-y-3">
+              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide flex items-center gap-1.5">
+                ✅ Resolved By
+              </p>
+              <div className="flex items-center gap-3">
+                <img
+                  src={data.resolver_image || "https://i.pravatar.cc/100?u=resolver"}
+                  alt=""
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-200"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{data.resolver_name}</p>
+                  <p className="text-xs text-gray-500">{data.resolver_email}</p>
+                  <p className="text-xs text-gray-500">{data.resolver_phone}</p>
+                </div>
+              </div>
+              {data.resolved_time && (
+                <p className="text-xs text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-lg">
+                  ✔ Resolved on {data.resolved_time}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 space-y-2">
+            <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+              📍 Location Details
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-white rounded-lg px-3 py-2 border border-blue-100">
+                <p className="text-xs text-gray-400">Hostel</p>
+                <p className="text-sm font-semibold text-gray-800">{data.hostel || "—"}</p>
+              </div>
+              <div className="bg-white rounded-lg px-3 py-2 border border-blue-100">
+                <p className="text-xs text-gray-400">Room</p>
+                <p className="text-sm font-semibold text-gray-800">{data.room || "—"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Reported By */}
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              👤 Reported By
+            </p>
+            <div className="flex items-center gap-3">
+              <img
+                src={data.user_image || "https://i.pravatar.cc/100?u=student"}
+                alt=""
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-200"
+              />
+              <div>
+                <p className="text-sm font-semibold text-gray-800">{data.user_name}</p>
+                <p className="text-xs text-gray-500">{data.user_email}</p>
+                <p className="text-xs text-gray-500">{data.user_phone}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-2">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              📋 Description
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed">{data.description}</p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-white transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

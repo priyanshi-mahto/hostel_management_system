@@ -17,6 +17,14 @@ CREATE TABLE hostel(
   capacity INT NOT NULL 
 );
 
+CREATE TABLE hostel_admin(
+   hostel_admin_id INT AUTO_INCREMENT PRIMARY KEY,
+   user_id INT NOT NULL UNIQUE,
+   hostel_id INT NOT NULL UNIQUE,
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+   FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE warden(
    warden_id INT AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(100) NOT NULL,
@@ -40,6 +48,7 @@ CREATE TABLE room(
    CHECK (unit BETWEEN 100 AND 999),
    floor INT NOT NULL,
    room_no VARCHAR(10) NOT NULL,
+   capacity INT NOT NULL DEFAULT 2,
    hostel_id INT NOT NULL,
    UNIQUE(hostel_id,unit,room_no),
    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -59,10 +68,12 @@ CREATE TABLE student (
    pincode VARCHAR(10),
    gender ENUM('MALE','FEMALE','NOT PREFER TO SAY') NOT NULL,
    user_id INT NOT NULL UNIQUE,
+   hostel_id INT,
    roll_no VARCHAR(20) NOT NULL UNIQUE,
    phone CHAR(10),
    CHECK (phone REGEXP '^[0-9]{10}$'),
-   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+   FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE guardian(
@@ -88,6 +99,7 @@ CREATE TABLE student_id_card(
     id_back_image VARCHAR(255) NOT NULL,
     verification_status ENUM('PENDING', 'VERIFIED', 'REJECTED')
 	DEFAULT 'PENDING',
+   rejection_reason TEXT,
     verified_by INT,
     FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (verified_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
@@ -212,3 +224,4 @@ CREATE TABLE leave_request (
     FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (approved_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
+

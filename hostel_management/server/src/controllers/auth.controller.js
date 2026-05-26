@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import {createUser, findUserByEmail, findUserById, updateUserPassword} from "../models/user.model.js";
 import { getStudentProfileByUserId } from "../models/student.model.js";
+import { getHostelAdminByUserId } from "../models/hostelAdmin.model.js";
 
 const generateToken =(user)=>{
     return jwt.sign(
@@ -69,6 +70,11 @@ export const getMe = async (req, res) => {
       const profile = await getStudentProfileByUserId(tokenUser.user_id);
       if (!profile) return res.status(404).json({ message: "Profile not found" });
       return res.json(profile);
+    }
+
+    if (tokenUser.role === "HOSTEL_ADMIN") {
+      const mapping = await getHostelAdminByUserId(tokenUser.user_id);
+      return res.json({ ...tokenUser, hostel_id: mapping?.hostel_id || null });
     }
 
     // For other roles, return minimal token info

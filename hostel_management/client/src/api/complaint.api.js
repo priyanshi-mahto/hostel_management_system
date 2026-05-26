@@ -17,3 +17,13 @@ export const submitComplaintFeedback = async (complaintId, data) => {
   );
   return res.data;
 };
+
+export const getAdminComplaints = async () => {
+  const res = await axios.get("/complaints");
+  return res.data;
+};
+
+export const updateAdminComplaintStatus = async (complaintId, status) => {
+  const res = await axios.put(`/complaints/${complaintId}/status`, { status });
+  return res.data;
+};

@@ -1,55 +1,96 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
-
-const mockNotifications = [
-  { id: 1, message: "Mess timings will change from Monday. Breakfast: 7–9 AM, Lunch: 12–2 PM, Dinner: 7–9 PM.", created_at: "2025-03-21 10:00", target: "All Students" },
-  { id: 2, message: "Water supply will be disrupted on 22nd March from 10 AM to 4 PM due to maintenance work.", created_at: "2025-03-20 15:30", target: "All Students" },
-  { id: 3, message: "Students are reminded to submit their semester fee by 31st March to avoid late charges.", created_at: "2025-03-19 09:00", target: "All Students" },
-  { id: 4, message: "Anti-ragging committee meeting scheduled on 25th March at 4 PM in the hostel conference room.", created_at: "2025-03-18 11:00", target: "Wardens & Staff" },
-  { id: 5, message: "Lost: Black wallet near Block A common room. Contact hostel office if found.", created_at: "2025-03-17 16:45", target: "Block A" },
-];
+import { getAdminNotifications, sendAdminNotification, deleteAdminNotification } from "../../api/admin.api";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ message: "", target: "All Students" });
+  const [form, setForm] = useState({ message: "", target_audience: "All Students", priority: "Normal" });
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const targets = ["All Students", "Block A", "Block B", "Block C", "Wardens & Staff", "Boys Hostels", "Girls Hostels"];
+  const targets = ["All Students", "Wardens & Staff"];
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
+
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await getAdminNotifications();
+      setNotifications(data);
+    } catch (err) {
+      console.error("Failed to load notifications", err);
+      setError(err?.response?.data?.message || "Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = notifications.filter(n =>
     n.message.toLowerCase().includes(search.toLowerCase()) ||
-    n.target.toLowerCase().includes(search.toLowerCase())
+    (n.target_audience || "").toLowerCase().includes(search.toLowerCase()) ||
+    (n.priority || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const sendNotification = () => {
-    if (!form.message.trim()) return;
-    const newN = {
-      id: notifications.length + 1,
-      message: form.message,
-      target: form.target,
-      created_at: new Date().toLocaleString("en-IN"),
-    };
-    setNotifications([newN, ...notifications]);
-    setForm({ message: "", target: "All Students" });
-    setShowModal(false);
+  const sendNotification = async () => {
+    if (!form.message.trim()) {
+      alert("Message cannot be empty");
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      await sendAdminNotification({
+        message: form.message,
+        target_audience: form.target_audience,
+        priority: form.priority,
+      });
+      setForm({ message: "", target_audience: "All Students", priority: "Normal" });
+      setShowModal(false);
+      await loadNotifications();
+    } catch (err) {
+      console.error("Failed to send notification", err);
+      alert(err?.response?.data?.message || "Failed to send notification");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+  const handleDeleteNotification = async (id) => {
+    try {
+      setActionLoading(true);
+      await deleteAdminNotification(id);
+      await loadNotifications();
+    } catch (err) {
+      console.error("Failed to delete notification", err);
+      alert(err?.response?.data?.message || "Failed to delete notification");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const targetColor = (t) => {
     const map = {
       "All Students": "bg-teal-100 text-teal-700",
-      "Block A": "bg-blue-100 text-blue-700",
-      "Block B": "bg-purple-100 text-purple-700",
-      "Block C": "bg-pink-100 text-pink-700",
       "Wardens & Staff": "bg-amber-100 text-amber-700",
-      "Boys Hostels": "bg-indigo-100 text-indigo-700",
-      "Girls Hostels": "bg-rose-100 text-rose-700",
     };
     return map[t] || "bg-gray-100 text-gray-600";
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-IN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -59,6 +100,7 @@ export default function Notifications() {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
           <p className="text-gray-400 text-sm mt-0.5">Broadcast messages to students and staff</p>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -77,7 +119,7 @@ export default function Notifications() {
             const now = new Date();
             return (now - d) < 7 * 24 * 60 * 60 * 1000;
           }).length, cls: "bg-emerald-50 text-emerald-700" },
-          { label: "Targeted Groups", value: [...new Set(notifications.map(n => n.target))].length, cls: "bg-purple-50 text-purple-700" },
+          { label: "Targeted Groups", value: [...new Set(notifications.map(n => n.target_audience))].length, cls: "bg-purple-50 text-purple-700" },
         ].map((s, i) => (
           <div key={i} className={`rounded-2xl p-4 ${s.cls} text-center`}>
             <p className="text-2xl font-black">{s.value}</p>
@@ -122,8 +164,9 @@ export default function Notifications() {
 
       {/* Notifications List */}
       <div className="space-y-3">
-        {filtered.map((n) => (
-          <div key={n.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        {loading && <div className="bg-white rounded-2xl p-6 text-center text-gray-500">Loading notifications...</div>}
+        {!loading && filtered.map((n) => (
+          <div key={n.notification_id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-xl flex items-center justify-center text-lg shrink-0">
                 🔔
@@ -132,23 +175,24 @@ export default function Notifications() {
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-gray-800 text-sm leading-relaxed font-medium">{n.message}</p>
                   <button
-                    onClick={() => deleteNotification(n.id)}
-                    className="text-gray-300 hover:text-red-400 transition-colors shrink-0 mt-0.5"
+                    onClick={() => handleDeleteNotification(n.notification_id)}
+                    disabled={actionLoading}
+                    className="text-gray-300 hover:text-red-400 transition-colors shrink-0 mt-0.5 disabled:opacity-50"
                     title="Delete"
                   >🗑️</button>
                 </div>
                 <div className="flex items-center gap-3 mt-2">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${targetColor(n.target)}`}>
-                    📢 {n.target}
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${targetColor(n.target_audience)}`}>
+                    📢 {n.target_audience}
                   </span>
-                  <span className="text-gray-400 text-xs">🕐 {n.created_at}</span>
+                  <span className="text-gray-400 text-xs">🕐 {formatDateTime(n.created_at)}</span>
                 </div>
               </div>
             </div>
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
             <p className="text-4xl mb-2">🔔</p>
             <p className="font-medium">No notifications found</p>
@@ -159,21 +203,22 @@ export default function Notifications() {
       {/* Send Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
               <h3 className="text-lg font-bold text-gray-800">📣 Send Notification</h3>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
             </div>
-            <div className="p-6 space-y-4">
+
+            <div className="p-6 space-y-4 overflow-auto">
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Target Audience</label>
                 <div className="flex flex-wrap gap-2">
                   {targets.map((t) => (
                     <button
                       key={t}
-                      onClick={() => setForm({ ...form, target: t })}
+                      onClick={() => setForm({ ...form, target_audience: t })}
                       className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                        form.target === t ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-teal-50"
+                        form.target_audience === t ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-teal-50"
                       }`}
                     >
                       {t}
@@ -181,12 +226,33 @@ export default function Notifications() {
                   ))}
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Priority</label>
+                <div className="flex gap-2">
+                  {[
+                    { key: 'Normal', label: 'Normal' },
+                    { key: 'Important', label: 'Important' }
+                  ].map(p => (
+                    <button
+                      key={p.key}
+                      onClick={() => setForm({ ...form, priority: p.key })}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                        form.priority === p.key ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Message</label>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  rows={5}
+                  rows={6}
                   placeholder="Type your notification message here..."
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
                 />
@@ -198,15 +264,16 @@ export default function Notifications() {
                 <div className="bg-teal-50 rounded-xl p-4 border border-teal-100">
                   <p className="text-xs font-bold text-teal-600 mb-1">PREVIEW</p>
                   <p className="text-sm text-teal-900">{form.message}</p>
-                  <p className="text-xs text-teal-400 mt-2">→ Sending to: {form.target}</p>
+                  <p className="text-xs text-teal-400 mt-2">→ Sending to: {form.target_audience} • Priority: {form.priority}</p>
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-100">
+
+            <div className="flex justify-end gap-3 p-4 border-t border-gray-100 flex-shrink-0 bg-white">
               <button onClick={() => setShowModal(false)} className="px-5 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600">Cancel</button>
               <button
                 onClick={sendNotification}
-                disabled={!form.message.trim()}
+                disabled={actionLoading || !form.message.trim()}
                 className="px-5 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition-colors"
               >
                 📣 Send Now

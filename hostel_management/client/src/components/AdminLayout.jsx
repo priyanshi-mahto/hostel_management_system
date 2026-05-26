@@ -4,12 +4,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 const navItems = [
   { path: "/admin/dashboard", label: "Dashboard", icon: "⊞" },
   { path: "/admin/students", label: "Students", icon: "🎓" },
-  { path: "/admin/rooms", label: "Room & Allocation", icon: "🏠" },
+  { path: "/admin/rooms", label: "Room Allocation", icon: "🏠" },
   { path: "/admin/complaints", label: "Complaints", icon: "📋" },
   { path: "/admin/visitors", label: "Visitor Requests", icon: "👥" },
-  { path: "/admin/lost-found", label: "Lost & Found", icon: "🔍" },
-  { path: "/admin/staff", label: "Warden & Staff", icon: "🛡️" },
+  { path: "/admin/staff", label: "Warden & Staff", icon: "👤" },
   { path: "/admin/id-cards", label: "ID Verification", icon: "🪪" },
+  { path: "/admin/lost-found", label: "Lost & Found", icon: "🔍" },
   { path: "/admin/notifications", label: "Notifications", icon: "🔔" },
 ];
 

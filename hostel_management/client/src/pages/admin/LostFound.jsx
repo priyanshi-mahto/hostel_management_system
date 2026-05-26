@@ -1,42 +1,124 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
-
-const mockItems = [
-  { id: 1, name: "Black Wallet", type: "Found", status: "Active", date: "2025-03-20 10:30", hostel: "Block A (Boys)", description: "Found near the common room entrance." },
-  { id: 2, name: "Water Bottle (Blue)", type: "Lost", status: "Active", date: "2025-03-19 15:45", hostel: "Block C (Girls)", description: "Lost in the dining hall during dinner." },
-  { id: 3, name: "Earphones (White)", type: "Found", status: "Claimed", date: "2025-03-18 09:00", hostel: "Block B (Boys)", description: "Found on the staircase near 2nd floor." },
-  { id: 4, name: "College ID Card", type: "Lost", status: "Active", date: "2025-03-17 14:20", hostel: "Block A (Boys)", description: "Lost somewhere in the hostel premises." },
-  { id: 5, name: "Umbrella (Black)", type: "Found", status: "Active", date: "2025-03-16 18:10", hostel: "Block C (Girls)", description: "Found at the hostel gate after the rain." },
-  { id: 6, name: "Charger (Type-C)", type: "Lost", status: "Claimed", date: "2025-03-15 11:30", hostel: "Block B (Boys)", description: "Left in the common study hall." },
-];
+import {
+  claimAdminLostFoundItem,
+  createAdminLostFoundItem,
+  getAdminLostFoundItems,
+  getAdminLostFoundStats,
+  getAllHostels,
+} from "../../api/admin.api";
 
 export default function LostFound() {
-  const [items, setItems] = useState(mockItems);
+  const [items, setItems] = useState([]);
+  const [stats, setStats] = useState({ total: 0, active: 0, claimed: 0 });
+  const [hostels, setHostels] = useState([]);
   const [filterType, setFilterType] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
   const [showModal, setShowModal] = useState(false);
-  const [newItem, setNewItem] = useState({ name: "", type: "Found", hostel: "Block A (Boys)", description: "" });
+  const [newItem, setNewItem] = useState({ name: "", type: "Found", hostelId: "", description: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const filtered = items.filter((item) => {
-    const matchType = filterType === "All" || item.type === filterType;
-    const matchStatus = filterStatus === "All" || item.status === filterStatus;
-    return matchType && matchStatus;
-  });
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const markClaimed = (id) => {
-    setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: "Claimed" } : i));
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const [itemsRes, statsRes, hostelsRes] = await Promise.all([
+        getAdminLostFoundItems(),
+        getAdminLostFoundStats(),
+        getAllHostels(),
+      ]);
+
+      const hostelMap = new Map(hostelsRes.map((h) => [h.hostel_id, h]));
+
+      const normalized = itemsRes.map((item) => {
+        const hostel = hostelMap.get(item.hostel_id);
+        const hostelLabel = hostel
+          ? `${hostel.hostel_name} (${hostel.type})`
+          : "Unknown Hostel";
+
+        return {
+          id: item.item_id,
+          name: item.item_name,
+          type: item.type,
+          status: item.status,
+          date: item.date,
+          hostelId: item.hostel_id,
+          hostel: hostelLabel,
+          description: item.type === "Found" ? "Please contact hostel office" : "Lost item reported",
+        };
+      });
+
+      setItems(normalized);
+      setStats(statsRes || { total: 0, active: 0, claimed: 0 });
+      setHostels(hostelsRes || []);
+
+      if (!newItem.hostelId && hostelsRes?.length) {
+        setNewItem((prev) => ({ ...prev, hostelId: String(hostelsRes[0].hostel_id) }));
+      }
+    } catch (err) {
+      console.error("Failed to load lost and found data", err);
+      setError(err?.response?.data?.message || "Failed to load lost and found data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addItem = () => {
-    const item = {
-      id: items.length + 1,
-      ...newItem,
-      status: "Active",
-      date: new Date().toLocaleString("en-IN"),
-    };
-    setItems([item, ...items]);
-    setShowModal(false);
-    setNewItem({ name: "", type: "Found", hostel: "Block A (Boys)", description: "" });
+  const filtered = useMemo(() => {
+    return items.filter((item) => {
+      const matchType = filterType === "All" || item.type === filterType;
+      const matchStatus = filterStatus === "All" || item.status === filterStatus;
+      return matchType && matchStatus;
+    });
+  }, [items, filterType, filterStatus]);
+
+  const markClaimed = async (id) => {
+    try {
+      setActionLoading(true);
+      await claimAdminLostFoundItem(id);
+      await loadData();
+    } catch (err) {
+      console.error("Failed to mark item as claimed", err);
+      alert(err?.response?.data?.message || "Failed to mark item as claimed");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const addItem = async () => {
+    if (!newItem.name.trim() || !newItem.hostelId) {
+      alert("Item name and hostel are required");
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      await createAdminLostFoundItem({
+        item_name: newItem.name.trim(),
+        type: newItem.type,
+        hostel_id: Number(newItem.hostelId),
+      });
+
+      setShowModal(false);
+      setNewItem({
+        name: "",
+        type: "Found",
+        hostelId: hostels[0] ? String(hostels[0].hostel_id) : "",
+        description: "",
+      });
+      await loadData();
+    } catch (err) {
+      console.error("Failed to add item", err);
+      alert(err?.response?.data?.message || "Failed to add item");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -46,6 +128,7 @@ export default function LostFound() {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Lost & Found</h2>
           <p className="text-gray-400 text-sm mt-0.5">Manage reported lost and found items</p>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -58,10 +141,10 @@ export default function LostFound() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
         {[
-          { label: "Total Items", value: items.length, cls: "bg-teal-50 text-teal-700" },
+          { label: "Total Items", value: stats.total || 0, cls: "bg-teal-50 text-teal-700" },
           { label: "Lost", value: items.filter(i => i.type === "Lost").length, cls: "bg-red-50 text-red-700" },
           { label: "Found", value: items.filter(i => i.type === "Found").length, cls: "bg-emerald-50 text-emerald-700" },
-          { label: "Claimed", value: items.filter(i => i.status === "Claimed").length, cls: "bg-gray-50 text-gray-600" },
+          { label: "Claimed", value: stats.claimed || 0, cls: "bg-gray-50 text-gray-600" },
         ].map((s, i) => (
           <div key={i} className={`rounded-2xl p-4 ${s.cls}`}>
             <p className="text-2xl font-black">{s.value}</p>
@@ -108,6 +191,12 @@ export default function LostFound() {
 
       {/* Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {loading && (
+          <div className="col-span-3 bg-white rounded-2xl p-6 text-gray-500 border border-gray-100">
+            Loading items...
+          </div>
+        )}
+
         {filtered.map((item) => (
           <div
             key={item.id}
@@ -138,13 +227,14 @@ export default function LostFound() {
 
             <div className="text-xs text-gray-400 space-y-1 mb-4">
               <p>🏨 {item.hostel}</p>
-              <p>🕐 {item.date}</p>
+              <p>🕐 {item.date ? new Date(item.date).toLocaleString("en-IN") : "-"}</p>
             </div>
 
             {item.status === "Active" && (
               <button
                 onClick={() => markClaimed(item.id)}
-                className="w-full py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl text-sm font-semibold transition-colors"
+                disabled={actionLoading}
+                className="w-full py-2 bg-teal-50 hover:bg-teal-100 disabled:opacity-60 text-teal-700 rounded-xl text-sm font-semibold transition-colors"
               >
                 ✓ Mark as Claimed
               </button>
@@ -157,7 +247,7 @@ export default function LostFound() {
           </div>
         ))}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="col-span-3 bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
             <p className="text-4xl mb-2">🔍</p>
             <p className="font-medium">No items found</p>
@@ -205,11 +295,15 @@ export default function LostFound() {
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Hostel Block</label>
                 <select
-                  value={newItem.hostel}
-                  onChange={(e) => setNewItem({ ...newItem, hostel: e.target.value })}
+                  value={newItem.hostelId}
+                  onChange={(e) => setNewItem({ ...newItem, hostelId: e.target.value })}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
                 >
-                  {["Block A (Boys)", "Block B (Boys)", "Block C (Girls)"].map(h => <option key={h}>{h}</option>)}
+                  {hostels.map((h) => (
+                    <option key={h.hostel_id} value={String(h.hostel_id)}>
+                      {h.hostel_name} ({h.type})
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -219,13 +313,13 @@ export default function LostFound() {
                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"
-                  placeholder="Where was it found/lost?"
+                  placeholder="Optional note (display only)"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-3 p-6 border-t border-gray-100">
               <button onClick={() => setShowModal(false)} className="px-5 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600">Cancel</button>
-              <button onClick={addItem} className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors">
+              <button onClick={addItem} disabled={actionLoading} className="px-5 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors">
                 Submit Report
               </button>
             </div>

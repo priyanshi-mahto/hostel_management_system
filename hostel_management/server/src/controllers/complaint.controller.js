@@ -1,13 +1,28 @@
 import{
     getAllComplaints,
     updateComplaintStatus,
-    addComplaintFeedback
+    addComplaintFeedback,
+    getComplaintsByHostel,
+    updateComplaintStatusByHostel,
 } from "../models/complaint.model.js";
 import { findStudentByUserId, getStudentComplaints } from "../models/student.model.js";
+import { getHostelAdminByUserId } from "../models/hostelAdmin.model.js";
 
 export const fetchAllComplaints = async(req,res)=>{
     try{
-        const complaints = await getAllComplaints();
+        let complaints;
+
+        if (req.user.role === "HOSTEL_ADMIN") {
+            const admin = await getHostelAdminByUserId(req.user.user_id);
+            if (!admin) {
+                return res.status(403).json({ message: "Hostel admin is not mapped to any hostel" });
+            }
+
+            complaints = await getComplaintsByHostel(admin.hostel_id);
+        } else {
+            complaints = await getAllComplaints();
+        }
+
         res.json(complaints);
     }catch(err){
         res.status(500).json({error:err.message});
@@ -16,7 +31,29 @@ export const fetchAllComplaints = async(req,res)=>{
 
 export const changeComplaintStatus = async (req,res)=>{
     try{
-        await updateComplaintStatus(req.params.id,req.body.status);
+        const { status } = req.body;
+
+        if (!["Pending", "Resolved"].includes(status)) {
+            return res.status(400).json({ message: "Invalid complaint status" });
+        }
+
+        let result;
+
+        if (req.user.role === "HOSTEL_ADMIN") {
+            const admin = await getHostelAdminByUserId(req.user.user_id);
+            if (!admin) {
+                return res.status(403).json({ message: "Hostel admin is not mapped to any hostel" });
+            }
+
+            result = await updateComplaintStatusByHostel(req.params.id, status, admin.hostel_id);
+        } else {
+            result = await updateComplaintStatus(req.params.id, status);
+        }
+
+        if (!result?.affectedRows) {
+            return res.status(404).json({ message: "Complaint not found" });
+        }
+
         res.json({message:"Complaint status updated"});
     }catch(err){
         res.status(500).json({error:err.message});

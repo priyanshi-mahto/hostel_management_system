@@ -7,6 +7,14 @@ export const getAllItems = async () => {
   return rows;
 };
 
+export const getItemsByHostel = async (hostelId) => {
+  const [rows] = await db.query(
+    "SELECT * FROM lost_and_found WHERE hostel_id = ? ORDER BY date DESC",
+    [hostelId]
+  );
+  return rows;
+};
+
 export const getStats = async () => {
   const [rows] = await db.query(
     `
@@ -17,6 +25,22 @@ export const getStats = async () => {
         MAX(date) as latest
       FROM lost_and_found
     `
+  );
+  return rows[0];
+};
+
+export const getStatsByHostel = async (hostelId) => {
+  const [rows] = await db.query(
+    `
+      SELECT
+        COUNT(*) as total,
+        SUM(status='Active') as active,
+        SUM(status='Claimed') as claimed,
+        MAX(date) as latest
+      FROM lost_and_found
+      WHERE hostel_id = ?
+    `,
+    [hostelId]
   );
   return rows[0];
 };
@@ -36,6 +60,14 @@ export const updateItemStatus = async (itemId, status) => {
   const [result] = await db.query(
     "UPDATE lost_and_found SET status=? WHERE item_id=?",
     [status, itemId]
+  );
+  return result;
+};
+
+export const updateItemStatusByHostel = async (itemId, status, hostelId) => {
+  const [result] = await db.query(
+    "UPDATE lost_and_found SET status=? WHERE item_id=? AND hostel_id=?",
+    [status, itemId, hostelId]
   );
   return result;
 };
