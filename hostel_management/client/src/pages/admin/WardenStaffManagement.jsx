@@ -12,6 +12,19 @@ import {
   updateAdminOfficeStaff,
   updateAdminWarden,
 } from "../../api/admin.api";
+import {
+  FiPlus,
+  FiShield,
+  FiUser,
+  FiHome,
+  FiPhone,
+  FiMail,
+  FiTag,
+  FiEdit2,
+  FiTrash2,
+  FiAlertTriangle,
+  FiX
+} from "react-icons/fi";
 
 export default function WardenStaffManagement() {
   const [activeTab, setActiveTab] = useState("wardens");
@@ -171,7 +184,7 @@ export default function WardenStaffManagement() {
             onClick={openAdd}
             className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-md"
           >
-            ➕ Add {activeTab === "wardens" ? "Warden" : "Staff"}
+            <FiPlus className="w-4 h-4" /> Add {activeTab === "wardens" ? "Warden" : "Staff"}
           </button>
         )}
       </div>
@@ -191,13 +204,17 @@ export default function WardenStaffManagement() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5 w-fit">
-        {["wardens", "staff"].map((tab) => (
+        {[
+          { id: "wardens", label: "Wardens", icon: <FiShield className="w-4 h-4" /> },
+          { id: "staff", label: "Office Staff", icon: <FiUser className="w-4 h-4" /> }
+        ].map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${activeTab === tab ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
-            {tab === "wardens" ? "🛡️ Wardens" : "👤 Office Staff"}
+            {tab.icon}
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -221,19 +238,23 @@ export default function WardenStaffManagement() {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-bold text-gray-800 text-lg">{w.name}</h3>
-                      <span className="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full mt-1">
-                        🏨 {w.hostel_name} ({w.type})
+                      <span className="inline-flex items-center gap-1 bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full mt-1">
+                        <FiHome className="w-3 h-3" /> {w.hostel_name} ({w.type})
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(w)} className="p-2 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors">✏️</button>
-                      <button onClick={() => handleDelete(w)} className="p-2 text-red-400 hover:bg-red-50 rounded-xl transition-colors">🗑️</button>
+                      <button onClick={() => openEdit(w)} className="p-2 text-teal-600 hover:bg-teal-50 rounded-xl transition-colors">
+                        <FiEdit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(w)} className="p-2 text-red-400 hover:bg-red-50 rounded-xl transition-colors">
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                   <div className="mt-3 space-y-1.5 text-sm text-gray-500">
-                    <p>📞 {w.phone || "Not added"}</p>
-                    <p>✉️ {w.email}</p>
-                    <p>🆔 User #{w.user_id}</p>
+                    <p className="flex items-center gap-1.5"><FiPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {w.phone || "Not added"}</p>
+                    <p className="flex items-center gap-1.5"><FiMail className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {w.email}</p>
+                    <p className="flex items-center gap-1.5"><FiTag className="w-3.5 h-3.5 text-gray-400 shrink-0" /> User #{w.user_id}</p>
                   </div>
                 </div>
               </div>
@@ -243,7 +264,7 @@ export default function WardenStaffManagement() {
           {/* Unassigned Hostel Notice */}
           {uncoveredHostels.map(h => (
             <div key={h} className="bg-amber-50 border-2 border-dashed border-amber-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-              <p className="text-3xl mb-2">⚠️</p>
+              <FiAlertTriangle className="w-8 h-8 text-amber-500 mb-2" />
               <p className="font-bold text-amber-700">{h}</p>
               <p className="text-amber-600 text-sm mt-1">No warden assigned</p>
               <button onClick={openAdd} className="mt-3 px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-sm font-semibold transition-colors">
@@ -291,8 +312,12 @@ export default function WardenStaffManagement() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex gap-2">
-                        <button onClick={() => openEdit(s)} className="p-1.5 text-teal-600 hover:bg-teal-100 rounded-lg transition-colors">✏️</button>
-                        <button onClick={() => handleDelete(s)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors">🗑️</button>
+                        <button onClick={() => openEdit(s)} className="p-1.5 text-teal-600 hover:bg-teal-100 rounded-lg transition-colors flex items-center justify-center">
+                          <FiEdit2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDelete(s)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center">
+                          <FiTrash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -316,7 +341,9 @@ export default function WardenStaffManagement() {
               <h3 className="text-lg font-bold text-gray-800">
                 {editItem ? "Edit" : "Add"} {activeTab === "wardens" ? "Warden" : "Staff Member"}
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FiX className="w-5 h-5" />
+              </button>
             </div>
             <div className="p-6 space-y-4">
               {!editItem && (

@@ -1,12 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "../api/axios";
+import { getStudentProfile } from "../api/student.api";
+import {
+  FiGrid,
+  FiFileText,
+  FiSearch,
+  FiUsers,
+  FiCreditCard,
+  FiUser,
+  FiKey,
+  FiLogOut,
+  FiChevronLeft,
+  FiChevronRight
+} from "react-icons/fi";
 
 const navItems = [
-  { path: "/student", label: "Dashboard", icon: "⊞" },
-  { path: "/student/complaints", label: "Complaints", icon: "📋" },
-  { path: "/student/lost-found", label: "Lost & Found", icon: "🔍" },
-  { path: "/student/visitors", label: "Visitor Requests", icon: "👥" },
-  { path: "/student/id-card", label: "ID Card", icon: "🪪" },
+  { path: "/student", label: "Dashboard", icon: <FiGrid className="w-4 h-4" /> },
+  { path: "/student/complaints", label: "Complaints", icon: <FiFileText className="w-4 h-4" /> },
+  { path: "/student/lost-found", label: "Lost & Found", icon: <FiSearch className="w-4 h-4" /> },
+  { path: "/student/visitors", label: "Visitor Requests", icon: <FiUsers className="w-4 h-4" /> },
+  { path: "/student/id-card", label: "ID Card", icon: <FiCreditCard className="w-4 h-4" /> },
 ];
 
 const pageTitles = {
@@ -27,15 +41,49 @@ export default function StudentLayout({ children }) {
   const navigate = useNavigate();
   const dropdownRef = useRef();
 
-  // Retrieve user details from localStorage
-  let displayUser = {};
-  try {
-    if (localStorage.getItem("user")) {
-      displayUser = JSON.parse(localStorage.getItem("user"));
+  const [userProfile, setUserProfile] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || {};
+    } catch {
+      return {};
     }
-  } catch (e) {
-    console.error("Failed to parse stored user", e);
-  }
+  });
+
+  useEffect(() => {
+    getStudentProfile()
+      .then((data) => {
+        localStorage.setItem("user", JSON.stringify(data));
+        setUserProfile(data);
+      })
+      .catch((err) => console.error("Failed to refresh layout profile:", err));
+  }, []);
+
+  const apiBase = (axios.defaults?.baseURL || "http://localhost:5001/api").replace(/\/+api\/?$/i, "");
+  const avatarUrl = userProfile.profile_image
+    ? (userProfile.profile_image.startsWith("http") ? userProfile.profile_image : `${apiBase}/uploads/profile/${userProfile.profile_image}`)
+    : null;
+
+  const renderAvatar = (sizeClass = "w-9 h-9", ringClass = "ring-2 ring-teal-400", extraClass = "", onClick = null) => {
+    if (avatarUrl) {
+      return (
+        <img
+          src={avatarUrl}
+          alt="profile"
+          onClick={onClick}
+          className={`${sizeClass} rounded-full object-cover ${ringClass} shrink-0 ${extraClass}`}
+        />
+      );
+    }
+    const initial = userProfile.name ? userProfile.name.trim().charAt(0).toUpperCase() : "?";
+    return (
+      <div
+        onClick={onClick}
+        className={`${sizeClass} rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold flex items-center justify-center shrink-0 uppercase ${ringClass} ${extraClass}`}
+      >
+        {initial}
+      </div>
+    );
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -79,7 +127,7 @@ export default function StudentLayout({ children }) {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="ml-auto text-teal-300 hover:text-white transition-colors"
           >
-            {sidebarOpen ? "◀" : "▶"}
+            {sidebarOpen ? <FiChevronLeft className="w-5 h-5" /> : <FiChevronRight className="w-5 h-5" />}
           </button>
         </div>
 
@@ -117,17 +165,13 @@ export default function StudentLayout({ children }) {
               className="flex items-center gap-3 cursor-pointer hover:bg-teal-800/50 p-2 rounded-xl transition-colors"
               onClick={() => navigate("/student/profile")}
             >
-              <img
-                src={displayUser.profile_image || "https://i.pravatar.cc/100"}
-                alt="profile"
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-400 shrink-0"
-              />
+              {renderAvatar("w-9 h-9", "ring-2 ring-emerald-400", "text-sm")}
               <div className="overflow-hidden">
                 <p className="text-sm font-semibold text-white truncate">
-                  {displayUser.name || "Guest"}
+                  {userProfile.name || "Guest"}
                 </p>
                 <p className="text-xs text-teal-300 truncate">
-                  {displayUser.email || ""}
+                  {userProfile.email || ""}
                 </p>
               </div>
             </div>
@@ -138,7 +182,7 @@ export default function StudentLayout({ children }) {
               !sidebarOpen && "justify-center"
             }`}
           >
-            <span className="text-lg">🚪</span>
+            <FiLogOut className="text-lg shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
           </button>
         </div>
@@ -168,16 +212,16 @@ export default function StudentLayout({ children }) {
                 placeholder="Search..."
                 className="pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 w-52"
               />
-              <span className="absolute left-3 top-2.5 text-gray-400 text-sm">🔎</span>
+              <FiSearch className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
             </div>
             {/* Profile Dropdown */}
             <div className="relative" ref={dropdownRef}>
-              <img
-                src={displayUser.profile_image || "https://i.pravatar.cc/100"}
-                alt="profile"
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="w-9 h-9 rounded-full object-cover cursor-pointer ring-2 ring-teal-400 hover:ring-emerald-400 transition-all"
-              />
+              {renderAvatar(
+                "w-9 h-9",
+                "ring-2 ring-teal-400 hover:ring-emerald-400",
+                "cursor-pointer transition-all",
+                () => setProfileOpen(!profileOpen)
+              )}
               {profileOpen && (
                 <div className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in">
                   <p
@@ -187,7 +231,7 @@ export default function StudentLayout({ children }) {
                     }}
                     className="px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer transition-colors font-medium flex items-center gap-2"
                   >
-                    👤 Profile
+                    <FiUser className="w-4 h-4" /> Profile
                   </p>
                   <p
                     onClick={() => {
@@ -196,14 +240,14 @@ export default function StudentLayout({ children }) {
                     }}
                     className="px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer transition-colors font-medium flex items-center gap-2"
                   >
-                    🔑 Password
+                    <FiKey className="w-4 h-4" /> Password
                   </p>
                   <hr className="border-gray-100" />
                   <p
                     onClick={handleLogout}
                     className="px-4 py-3 text-sm text-red-500 hover:bg-red-50 cursor-pointer transition-colors font-medium flex items-center gap-2"
                   >
-                    🚪 Logout
+                    <FiLogOut className="w-4 h-4" /> Logout
                   </p>
                 </div>
               )}

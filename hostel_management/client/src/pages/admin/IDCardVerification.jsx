@@ -6,6 +6,14 @@ import {
   rejectAdminIdCard,
   verifyAdminIdCard,
 } from "../../api/admin.api";
+import {
+  FiFileText,
+  FiX,
+  FiCalendar,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiCheck
+} from "react-icons/fi";
 
 const statusConfig = {
   PENDING: { cls: "bg-amber-100 text-amber-700", label: "Pending" },
@@ -198,7 +206,7 @@ export default function IDCardVerification() {
 
           {!loading && filtered.length === 0 && (
             <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-              <p className="text-4xl mb-2">🪪</p>
+              <FiFileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
               <p className="font-medium">No ID cards found</p>
             </div>
           )}
@@ -210,7 +218,9 @@ export default function IDCardVerification() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sticky top-0">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-gray-800">ID Card Preview</h3>
-                <button onClick={() => setSelectedId(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+                <button onClick={() => setSelectedId(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <FiX className="w-5 h-5" />
+                </button>
               </div>
 
               <div className="text-center mb-4">
@@ -233,7 +243,7 @@ export default function IDCardVerification() {
                       <img src={selected.front} alt="ID Front" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center">
-                        <p className="text-2xl">🪪</p>
+                        <FiFileText className="w-8 h-8 text-gray-300 mx-auto mb-1" />
                         <p className="text-xs mt-1">Front Side</p>
                       </div>
                     )}
@@ -247,7 +257,7 @@ export default function IDCardVerification() {
                       <img src={selected.back} alt="ID Back" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center">
-                        <p className="text-2xl">🪪</p>
+                        <FiFileText className="w-8 h-8 text-gray-300 mx-auto mb-1" />
                         <p className="text-xs mt-1">Back Side</p>
                       </div>
                     )}
@@ -256,10 +266,10 @@ export default function IDCardVerification() {
               </div>
 
               <div className="text-xs text-gray-400 mb-4 space-y-1">
-                <p>📅 Submitted: {selected.submitted}</p>
-                {selected.verifiedBy && <p>✅ Verified by: {selected.verifiedBy}</p>}
+                <p className="flex items-center gap-1"><FiCalendar className="w-3.5 h-3.5" /> Submitted: {selected.submitted}</p>
+                {selected.verifiedBy && <p className="flex items-center gap-1"><FiCheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Verified by: {selected.verifiedBy}</p>}
                 {selected.status === "REJECTED" && selected.rejectionReason && (
-                  <p>❌ Reason: {selected.rejectionReason}</p>
+                  <p className="flex items-center gap-1 text-red-500"><FiAlertCircle className="w-3.5 h-3.5" /> Reason: {selected.rejectionReason}</p>
                 )}
               </div>
 
@@ -268,16 +278,16 @@ export default function IDCardVerification() {
                   <button
                     onClick={() => verifyCard(selected)}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white rounded-xl text-sm font-bold transition-colors"
+                    className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    ✓ Verify ID Card
+                    <FiCheck className="w-4 h-4" /> Verify ID Card
                   </button>
                   <button
                     onClick={() => openReject(selected)}
                     disabled={actionLoading}
-                    className="w-full py-2.5 bg-red-50 hover:bg-red-100 disabled:opacity-60 text-red-600 rounded-xl text-sm font-bold transition-colors"
+                    className="w-full py-2.5 bg-red-50 hover:bg-red-100 disabled:opacity-60 text-red-600 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    ✕ Reject
+                    <FiX className="w-4 h-4" /> Reject
                   </button>
                 </div>
               )}

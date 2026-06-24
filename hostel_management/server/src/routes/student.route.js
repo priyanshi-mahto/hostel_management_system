@@ -1,9 +1,9 @@
 import express from "express";
-import {getProfile,updateProfile,raiseComplaint,getComplaints,applyLeaveController,getLeaves,createVisitingRequest, getDashboard,uploadIDCard, getIDCard} from "../controllers/student.controller.js";
+import {getProfile,updateProfile,raiseComplaint,getComplaints,applyLeaveController,getLeaves,createVisitingRequest, getDashboard,uploadIDCard, getIDCard, uploadProfileImage, removeProfileImage} from "../controllers/student.controller.js";
 
 import {protect} from "../middleware/auth.middleware.js";
 import {allowRoles} from "../middleware/role.middleware.js";
-import { upload } from "../middleware/upload.middleware.js";
+import { upload, uploadProfile } from "../middleware/upload.middleware.js";
 
 const router=express.Router();
 
@@ -14,6 +14,9 @@ router.get("/dashboard", getDashboard);
 
 router.get("/profile", getProfile);
 router.put("/profile", updateProfile);
+
+router.post("/profile-image", uploadProfile.single("profile_image"), uploadProfileImage);
+router.delete("/profile-image", removeProfileImage);
 
 router.post("/complaint", raiseComplaint);
 router.get("/complaint", getComplaints);

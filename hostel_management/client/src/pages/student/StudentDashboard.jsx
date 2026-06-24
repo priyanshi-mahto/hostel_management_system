@@ -167,9 +167,20 @@
 
 
 import { useEffect, useState } from "react";
+import axios from "../../api/axios";
 import { getStudentDashboard } from "../../api/student.api";
 import StudentLayout from "../../components/StudentLayout";
 import { useNavigate } from "react-router-dom";
+import {
+  FiSearch,
+  FiActivity,
+  FiClock,
+  FiFileText,
+  FiUser,
+  FiBookOpen,
+  FiUsers,
+  FiCheckCircle
+} from "react-icons/fi";
 
 export default function StudentDashboard() {
   const [data, setData] = useState(null);
@@ -201,10 +212,10 @@ export default function StudentDashboard() {
   const { student, room, stats } = data;
 
   const statCards = [
-    { label: "Lost & Found", value: stats.lost, color: "bg-teal-50 text-teal-700 border-teal-100", icon: "🔍" },
-    { label: "In Progress", value: stats.inProgress, color: "bg-blue-50 text-blue-700 border-blue-100", icon: "⚙️" },
-    { label: "Pending", value: stats.pending, color: "bg-amber-50 text-amber-700 border-amber-100", icon: "⏳" },
-    { label: "Complaints", value: stats.complaints, color: "bg-rose-50 text-rose-700 border-rose-100", icon: "📋" },
+    { label: "Lost & Found", value: stats.lost, color: "bg-teal-50 text-teal-700 border-teal-100", icon: <FiSearch className="w-5 h-5" /> },
+    { label: "In Progress", value: stats.inProgress, color: "bg-blue-50 text-blue-700 border-blue-100", icon: <FiActivity className="w-5 h-5" /> },
+    { label: "Pending", value: stats.pending, color: "bg-amber-50 text-amber-700 border-amber-100", icon: <FiClock className="w-5 h-5" /> },
+    { label: "Complaints", value: stats.complaints, color: "bg-rose-50 text-rose-700 border-rose-100", icon: <FiFileText className="w-5 h-5" /> },
   ];
 
   return (
@@ -215,15 +226,21 @@ export default function StudentDashboard() {
           {/* Profile Card */}
           <div className="bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-2xl p-6 text-white shadow-xl">
             <div className="flex items-center gap-4">
-              <img
-                src={student.profile_image || "https://i.pravatar.cc/100"}
-                alt=""
-                className="w-16 h-16 rounded-2xl object-cover ring-4 ring-emerald-400/50 shrink-0"
-              />
+              {student.profile_image ? (
+                <img
+                  src={student.profile_image.startsWith("http") ? student.profile_image : `${(axios.defaults?.baseURL || "http://localhost:5001/api").replace(/\/+api\/?$/i, "")}/uploads/profile/${student.profile_image}`}
+                  alt="profile"
+                  className="w-16 h-16 rounded-2xl object-cover ring-4 ring-emerald-400/50 shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-2xl bg-teal-700 border border-teal-600 text-emerald-300 font-bold text-2xl flex items-center justify-center shrink-0 uppercase shadow-inner">
+                  {student.name ? student.name.trim().charAt(0) : "?"}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h2 className="text-xl font-bold text-white truncate">{student.name}</h2>
-                <p className="text-teal-300 text-sm mt-0.5">🎓 {student.roll_no}</p>
-                <p className="text-teal-300 text-sm">📘 {student.program}</p>
+                <p className="text-teal-300 text-sm mt-0.5 flex items-center gap-1.5"><FiUser className="w-3.5 h-3.5 text-emerald-300 shrink-0" /> {student.roll_no}</p>
+                <p className="text-teal-300 text-sm flex items-center gap-1.5"><FiBookOpen className="w-3.5 h-3.5 text-emerald-300 shrink-0" /> {student.program}</p>
               </div>
               <span className="shrink-0 bg-emerald-400 text-teal-900 text-xs font-bold px-3 py-1.5 rounded-full">
                 {room.block}
@@ -256,8 +273,8 @@ export default function StudentDashboard() {
 
             <div className="flex items-end gap-3 mb-4">
               <span className="text-5xl font-black text-teal-700">{room.room_no}</span>
-              <span className="text-sm text-gray-400 mb-1.5">
-                👥 {room.occupied}/{room.capacity} Occupied
+              <span className="text-sm text-gray-400 mb-1.5 flex items-center gap-1">
+                <FiUsers className="w-4 h-4 text-teal-600" /> {room.occupied}/{room.capacity} Occupied
               </span>
             </div>
 
@@ -318,7 +335,7 @@ export default function StudentDashboard() {
 
                 {stats.complaints === 0 ? (
                   <div className="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    <p className="text-2xl mb-1">✅</p>
+                    <FiCheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
                     <p className="text-sm font-semibold text-gray-600">No active complaints</p>
                     <p className="text-xs text-gray-400 mt-0.5">Everything looks good!</p>
                   </div>

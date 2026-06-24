@@ -7,6 +7,7 @@ import {
   getAdminLostFoundStats,
   getAllHostels,
 } from "../../api/admin.api";
+import { FiPlus, FiHome, FiClock, FiCheck, FiSearch, FiX } from "react-icons/fi";
 
 export default function LostFound() {
   const [items, setItems] = useState([]);
@@ -134,7 +135,7 @@ export default function LostFound() {
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-md"
         >
-          ➕ Report Item
+          <FiPlus className="w-4 h-4" /> Report Item
         </button>
       </div>
 
@@ -211,7 +212,7 @@ export default function LostFound() {
                   item.type === "Lost" ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"
                 }`}
               >
-                {item.type === "Lost" ? "🔴 Lost" : "🟢 Found"}
+                {item.type === "Lost" ? "Lost" : "Found"}
               </span>
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -226,22 +227,22 @@ export default function LostFound() {
             <p className="text-gray-500 text-sm mb-3">{item.description}</p>
 
             <div className="text-xs text-gray-400 space-y-1 mb-4">
-              <p>🏨 {item.hostel}</p>
-              <p>🕐 {item.date ? new Date(item.date).toLocaleString("en-IN") : "-"}</p>
+              <p className="flex items-center gap-1.5"><FiHome className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {item.hostel}</p>
+              <p className="flex items-center gap-1.5"><FiClock className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {item.date ? new Date(item.date).toLocaleString("en-IN") : "-"}</p>
             </div>
 
             {item.status === "Active" && (
               <button
                 onClick={() => markClaimed(item.id)}
                 disabled={actionLoading}
-                className="w-full py-2 bg-teal-50 hover:bg-teal-100 disabled:opacity-60 text-teal-700 rounded-xl text-sm font-semibold transition-colors"
+                className="w-full py-2 bg-teal-50 hover:bg-teal-100 disabled:opacity-60 text-teal-700 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
-                ✓ Mark as Claimed
+                <FiCheck className="w-4 h-4" /> Mark as Claimed
               </button>
             )}
             {item.status === "Claimed" && (
-              <div className="w-full py-2 text-center text-gray-400 text-sm">
-                ✓ Claimed
+              <div className="w-full py-2 text-center text-gray-400 text-sm flex items-center justify-center gap-1.5">
+                <FiCheck className="w-4 h-4 text-gray-400" /> Claimed
               </div>
             )}
           </div>
@@ -249,7 +250,7 @@ export default function LostFound() {
 
         {!loading && filtered.length === 0 && (
           <div className="col-span-3 bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-            <p className="text-4xl mb-2">🔍</p>
+            <FiSearch className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="font-medium">No items found</p>
           </div>
         )}
@@ -261,7 +262,9 @@ export default function LostFound() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-800">Report New Item</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FiX className="w-5 h-5" />
+              </button>
             </div>
             <div className="p-6 space-y-4">
               <div>

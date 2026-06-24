@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { changePassword } from "../api/auth.api";
 import StudentLayout from "./StudentLayout";
+import { FiX } from "react-icons/fi";
 
 const ChangePassword = ({ onClose }) => {
   const navigate = useNavigate();
@@ -144,7 +145,7 @@ const ChangePassword = ({ onClose }) => {
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              ✕
+              <FiX className="w-5 h-5" />
             </button>
           </div>
 

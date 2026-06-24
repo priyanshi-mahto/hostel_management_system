@@ -89,6 +89,7 @@
 import React, { useEffect, useState } from "react";
 import StudentLayout from "../../components/StudentLayout";
 import { getAllItems, getStats } from "../../api/lostFound";
+import { FiCalendar, FiBox, FiCheckCircle, FiTag, FiSearch } from "react-icons/fi";
 
 const statusStyles = {
   active: "bg-emerald-100 text-emerald-700",
@@ -108,7 +109,9 @@ function ItemCard({ item }) {
         </span>
       </div>
       <p className="text-xs text-gray-400 font-mono">ID: {item._id}</p>
-      <p className="text-xs text-gray-400">📅 {new Date(item.date).toDateString()}</p>
+      <p className="text-xs text-gray-400 flex items-center gap-1.5">
+        <FiCalendar className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {new Date(item.date).toDateString()}
+      </p>
       <p className="text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-2">{item.description}</p>
     </div>
   );
@@ -117,10 +120,10 @@ function ItemCard({ item }) {
 const TABS = ["All", "Active", "Claimed"];
 
 const statConfig = [
-  { key: "total",      label: "Total Items",  icon: "📦", color: "bg-teal-50 text-teal-700 border-teal-100" },
-  { key: "active",     label: "Active",       icon: "✅", color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
-  { key: "claimed",    label: "Claimed",      icon: "🏷️", color: "bg-blue-50 text-blue-700 border-blue-100" },
-  { key: "latestDate", label: "Latest",       icon: "📅", color: "bg-purple-50 text-purple-700 border-purple-100" },
+  { key: "total",      label: "Total Items",  icon: <FiBox className="w-5 h-5" />, color: "bg-teal-50 text-teal-700 border-teal-100" },
+  { key: "active",     label: "Active",       icon: <FiCheckCircle className="w-5 h-5" />, color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+  { key: "claimed",    label: "Claimed",      icon: <FiTag className="w-5 h-5" />, color: "bg-blue-50 text-blue-700 border-blue-100" },
+  { key: "latestDate", label: "Latest",       icon: <FiCalendar className="w-5 h-5" />, color: "bg-purple-50 text-purple-700 border-purple-100" },
 ];
 
 const LostFound = () => {
@@ -191,7 +194,7 @@ const LostFound = () => {
 
           {/* Search */}
           <div className="relative flex-1 min-w-[180px]">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔎</span>
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search items..."
@@ -205,7 +208,7 @@ const LostFound = () => {
         {/* Items */}
         {filteredItems.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
-            <p className="text-4xl mb-3">🔍</p>
+            <FiSearch className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <h3 className="font-bold text-gray-700 text-lg">No items found</h3>
             <p className="text-sm text-gray-400 mt-1">Try changing the filter or search term</p>
           </div>

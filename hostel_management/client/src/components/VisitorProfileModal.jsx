@@ -79,6 +79,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { createVisitorProfile, getVisitorProfiles } from "../api/visitor.api";
+import { FiX, FiAlertTriangle, FiSearch, FiUser } from "react-icons/fi";
 
 const inputClass =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all";
@@ -128,7 +129,7 @@ export const VisitorProfileModal = ({ onClose, onSaved }) => {
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-gray-400 hover:text-gray-600 transition-colors"
           >
-            ✕
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 
@@ -168,8 +169,8 @@ export const VisitorProfileModal = ({ onClose, onSaved }) => {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
-              ⚠️ {error}
+            <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 flex items-center gap-1.5">
+              <FiAlertTriangle className="w-4 h-4 text-red-500 shrink-0" /> {error}
             </p>
           )}
         </div>
@@ -241,14 +242,14 @@ export const ManageProfilesModal = ({ onClose }) => {
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-gray-400 hover:text-gray-600 transition-colors"
           >
-            ✕
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search */}
         <div className="px-6 py-3 border-b border-gray-100 shrink-0">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔎</span>
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search by name, relation, email..."
@@ -263,7 +264,7 @@ export const ManageProfilesModal = ({ onClose }) => {
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
           {filteredProfiles.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-3xl mb-2">👤</p>
+              <FiUser className="w-8 h-8 text-gray-300 mx-auto mb-2" />
               <p className="text-sm font-semibold text-gray-600">No profiles found</p>
               <p className="text-xs text-gray-400 mt-1">Try adjusting your search</p>
             </div>

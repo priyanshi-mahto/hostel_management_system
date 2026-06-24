@@ -4,6 +4,16 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import { getAdminVisitorRequests, updateAdminVisitorRequestStatus } from "../../api/admin.api";
+import {
+  FiCalendar,
+  FiUsers,
+  FiClock,
+  FiChevronUp,
+  FiChevronDown,
+  FiCheck,
+  FiX,
+  FiRefreshCw
+} from "react-icons/fi";
 
 const relationColors = {
   Parent: "bg-blue-100 text-blue-700",
@@ -121,12 +131,12 @@ export default function VisitorRequests() {
                   </div>
                   <p className="text-gray-600 text-sm mb-2">"{req.reason}"</p>
                   <div className="flex flex-wrap gap-3 text-xs text-gray-400">
-                    <span>📅 {req.from} → {req.to}</span>
-                    <span>👥 {req.visitors.length} visitor{req.visitors.length > 1 ? "s" : ""}</span>
-                    <span>🕐 Applied: {req.created}</span>
+                    <span className="flex items-center gap-1"><FiCalendar className="w-3.5 h-3.5 text-gray-400" /> {req.from} &rarr; {req.to}</span>
+                    <span className="flex items-center gap-1"><FiUsers className="w-3.5 h-3.5 text-gray-400" /> {req.visitors.length} visitor{req.visitors.length > 1 ? "s" : ""}</span>
+                    <span className="flex items-center gap-1"><FiClock className="w-3.5 h-3.5 text-gray-400" /> Applied: {req.created}</span>
                   </div>
                 </div>
-                <span className="text-gray-400 text-sm">{expanded === req.id ? "▲" : "▼"}</span>
+                {expanded === req.id ? <FiChevronUp className="w-4 h-4 text-gray-400" /> : <FiChevronDown className="w-4 h-4 text-gray-400" />}
               </div>
             </div>
 
@@ -155,15 +165,15 @@ export default function VisitorRequests() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => updateStatus(req.id, "Approved")}
-                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-colors"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-1.5"
                     >
-                      ✓ Approve
+                      <FiCheck className="w-4 h-4" /> Approve
                     </button>
                     <button
                       onClick={() => updateStatus(req.id, "Rejected")}
-                      className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-colors"
+                      className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-1.5"
                     >
-                      ✕ Reject
+                      <FiX className="w-4 h-4" /> Reject
                     </button>
                   </div>
                 )}
@@ -171,9 +181,9 @@ export default function VisitorRequests() {
                 {req.status !== "Pending" && (
                   <button
                     onClick={() => updateStatus(req.id, "Pending")}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-sm font-medium transition-colors"
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5"
                   >
-                    ↩ Reset to Pending
+                    <FiRefreshCw className="w-4 h-4" /> Reset to Pending
                   </button>
                 )}
               </div>
@@ -183,7 +193,7 @@ export default function VisitorRequests() {
 
         {filtered.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-            <p className="text-4xl mb-2">👥</p>
+            <FiUsers className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="font-medium">No visitor requests found</p>
           </div>
         )}

@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import { getAdminComplaints, updateAdminComplaintStatus } from "../../api/complaint.api";
+import {
+  FiZap,
+  FiTool,
+  FiWifi,
+  FiTrash2,
+  FiActivity,
+  FiAlertCircle,
+  FiSearch,
+  FiCheck,
+  FiRefreshCw,
+  FiFileText,
+  FiStar
+} from "react-icons/fi";
 
 const categoryIcons = {
-  Electrical: "⚡",
-  Plumbing: "🔧",
-  Internet: "📶",
-  Cleanliness: "🧹",
-  Civil: "🏗️",
-  Other: "📌",
+  Electrical: <FiZap className="w-5 h-5" />,
+  Plumbing: <FiTool className="w-5 h-5" />,
+  Internet: <FiWifi className="w-5 h-5" />,
+  Cleanliness: <FiTrash2 className="w-5 h-5" />,
+  Civil: <FiActivity className="w-5 h-5" />,
+  Other: <FiAlertCircle className="w-5 h-5" />,
 };
 
 const categoryColors = {
@@ -84,13 +97,15 @@ export default function ComplaintsManagement() {
 
   const resolvedRatings = complaints.filter((complaint) => typeof complaint.rating === "number");
   const avgRating = resolvedRatings.length
-    ? `${(resolvedRatings.reduce((sum, complaint) => sum + complaint.rating, 0) / resolvedRatings.length).toFixed(1)} ★`
+    ? `${(resolvedRatings.reduce((sum, complaint) => sum + complaint.rating, 0) / resolvedRatings.length).toFixed(1)}`
     : "N/A";
 
   const StarRating = ({ rating }) => (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={s <= rating ? "text-amber-400" : "text-gray-200"}>★</span>
+        <span key={s} className={s <= rating ? "text-amber-400" : "text-gray-200"}>
+          <FiStar className="w-3.5 h-3.5 fill-current" />
+        </span>
       ))}
     </div>
   );
@@ -111,10 +126,13 @@ export default function ComplaintsManagement() {
           { label: "Total", value: complaints.length, cls: "bg-teal-50 text-teal-700" },
           { label: "Pending", value: complaints.filter(c => c.status === "Pending").length, cls: "bg-amber-50 text-amber-700" },
           { label: "Resolved", value: complaints.filter(c => c.status === "Resolved").length, cls: "bg-emerald-50 text-emerald-700" },
-          { label: "Avg Rating", value: avgRating, cls: "bg-yellow-50 text-yellow-700" },
+          { label: "Avg Rating", value: avgRating, cls: "bg-yellow-50 text-yellow-700", hasStar: true },
         ].map((s, i) => (
           <div key={i} className={`rounded-2xl p-4 ${s.cls}`}>
-            <p className="text-2xl font-black">{s.value}</p>
+            <p className="text-2xl font-black flex items-center gap-1">
+              {s.value}
+              {s.hasStar && s.value !== "N/A" && <FiStar className="w-5 h-5 fill-amber-400 text-amber-400" />}
+            </p>
             <p className="text-xs font-semibold mt-0.5">{s.label}</p>
           </div>
         ))}
@@ -130,7 +148,7 @@ export default function ComplaintsManagement() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
           />
-          <span className="absolute left-3 top-3 text-gray-400">🔎</span>
+          <FiSearch className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
         </div>
         <select
           value={filterCat}
@@ -161,7 +179,7 @@ export default function ComplaintsManagement() {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3 flex-1">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${categoryColors[c.category]}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${categoryColors[c.category]}`}>
                   {categoryIcons[c.category]}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -194,7 +212,11 @@ export default function ComplaintsManagement() {
                       ? "bg-emerald-500 hover:bg-emerald-600 text-white"
                       : "bg-amber-100 hover:bg-amber-200 text-amber-700"}`}
                   >
-                    {c.status === "Pending" ? "✓ Mark Resolved" : "↩ Reopen"}
+                    {c.status === "Pending" ? (
+                      <span className="flex items-center gap-1.5"><FiCheck className="w-4 h-4" /> Mark Resolved</span>
+                    ) : (
+                      <span className="flex items-center gap-1.5"><FiRefreshCw className="w-4 h-4" /> Reopen</span>
+                    )}
                   </button>
                   <button
                     type="button"
@@ -212,7 +234,7 @@ export default function ComplaintsManagement() {
 
         {filtered.length === 0 && (
           <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-            <p className="text-4xl mb-2">📋</p>
+            <FiFileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="font-medium">No complaints found</p>
           </div>
         )}

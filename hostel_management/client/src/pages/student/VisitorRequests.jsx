@@ -140,15 +140,25 @@ import StudentLayout from "../../components/StudentLayout";
 import { VisitorProfileModal, ManageProfilesModal } from "../../components/VisitorProfileModal";
 import CreateRequestModal from "../../components/CreateRequestModal";
 import { getVisitorRequests } from "../../api/visitor.api";
+import {
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiFileText,
+  FiUser,
+  FiUsers,
+  FiArrowLeft,
+  FiArrowRight
+} from "react-icons/fi";
 
 const statusConfig = {
-  PENDING:  { color: "bg-amber-100 text-amber-700 border-amber-200",     icon: "⏳" },
-  APPROVED: { color: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: "✅" },
-  REJECTED: { color: "bg-red-100 text-red-600 border-red-200",           icon: "❌" },
+  PENDING:  { color: "bg-amber-100 text-amber-700 border-amber-200",     icon: <FiClock className="w-3.5 h-3.5" /> },
+  APPROVED: { color: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: <FiCheckCircle className="w-3.5 h-3.5" /> },
+  REJECTED: { color: "bg-red-100 text-red-600 border-red-200",           icon: <FiXCircle className="w-3.5 h-3.5" /> },
 };
 
 function RequestCard({ request }) {
-  const sc = statusConfig[request.status] || { color: "bg-gray-100 text-gray-600 border-gray-200", icon: "📋" };
+  const sc = statusConfig[request.status] || { color: "bg-gray-100 text-gray-600 border-gray-200", icon: <FiFileText className="w-3.5 h-3.5" /> };
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
@@ -221,7 +231,7 @@ const VisitorRequests = () => {
             onClick={() => setShowAddProfile(true)}
             className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-teal-200 hover:bg-teal-50/50 transition-all text-left"
           >
-            <span className="text-xl">👤</span>
+            <FiUser className="w-6 h-6 text-teal-600 shrink-0" />
             <div>
               <p className="text-sm font-bold text-gray-800">Add Profile</p>
               <p className="text-xs text-gray-400">Save a new contact</p>
@@ -231,7 +241,7 @@ const VisitorRequests = () => {
             onClick={() => setShowManageProfiles(true)}
             className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-teal-200 hover:bg-teal-50/50 transition-all text-left"
           >
-            <span className="text-xl">📋</span>
+            <FiFileText className="w-6 h-6 text-teal-600 shrink-0" />
             <div>
               <p className="text-sm font-bold text-gray-800">Manage Profiles</p>
               <p className="text-xs text-gray-400">View all contacts</p>
@@ -262,7 +272,7 @@ const VisitorRequests = () => {
         {/* Requests */}
         {filteredRequests.length === 0 ? (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
-            <p className="text-4xl mb-3">👥</p>
+            <FiUsers className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <h3 className="font-bold text-gray-700 text-lg">No Visitor Requests</h3>
             <p className="text-sm text-gray-400 mt-1">Create a new request to get started</p>
             <button
@@ -282,12 +292,12 @@ const VisitorRequests = () => {
 
         {/* Pagination */}
         <div className="flex items-center justify-center gap-2">
-          <button disabled className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-400 disabled:opacity-40">
-            ← Previous
+          <button disabled className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-400 disabled:opacity-40 flex items-center gap-1">
+            <FiArrowLeft className="w-4 h-4" /> Previous
           </button>
           <button className="w-9 h-9 rounded-xl bg-teal-600 text-white text-sm font-bold shadow-md shadow-teal-100">1</button>
-          <button disabled className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-400 disabled:opacity-40">
-            Next →
+          <button disabled className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-400 disabled:opacity-40 flex items-center gap-1">
+            Next <FiArrowRight className="w-4 h-4" />
           </button>
         </div>
 

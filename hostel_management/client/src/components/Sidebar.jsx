@@ -56,13 +56,14 @@
 
 
 import { useNavigate, useLocation } from "react-router-dom";
+import { FiGrid, FiFileText, FiSearch, FiUsers, FiCreditCard, FiX } from "react-icons/fi";
 
 const navItems = [
-  { path: "/student", label: "Dashboard", icon: "⊞" },
-  { path: "/student/complaints", label: "Complaints", icon: "📋" },
-  { path: "/student/lost-found", label: "Lost & Found", icon: "🔍" },
-  { path: "/student/visitors", label: "Visitors", icon: "👥" },
-  { path: "/student/id-card", label: "ID Card", icon: "🪪" },
+  { path: "/student", label: "Dashboard", icon: <FiGrid className="w-5 h-5" /> },
+  { path: "/student/complaints", label: "Complaints", icon: <FiFileText className="w-5 h-5" /> },
+  { path: "/student/lost-found", label: "Lost & Found", icon: <FiSearch className="w-5 h-5" /> },
+  { path: "/student/visitors", label: "Visitors", icon: <FiUsers className="w-5 h-5" /> },
+  { path: "/student/id-card", label: "ID Card", icon: <FiCreditCard className="w-5 h-5" /> },
 ];
 
 export default function Sidebar({ open, onClose, user }) {
@@ -105,9 +106,9 @@ export default function Sidebar({ open, onClose, user }) {
           </div>
           <button
             onClick={onClose}
-            className="ml-auto text-teal-300 hover:text-white transition-colors text-sm"
+            className="ml-auto text-teal-300 hover:text-white transition-colors"
           >
-            ✕
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 

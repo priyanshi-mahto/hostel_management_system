@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import pool from "../config/db.js";
 import {
   findStudentByUserId,
@@ -221,6 +223,72 @@ export const getIDCard = async (req, res) => {
     res.json(idcard);
   } catch (err) {
     console.error("GET ID CARD ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const uploadProfileImage = async (req, res) => {
+  try {
+    const student = await findStudentByUserId(req.user.user_id);
+    if (!student) return res.status(404).json({ message: "Student not found" });
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const filename = req.file.filename;
+
+    // Delete old profile image if exists
+    if (student.profile_image) {
+      const oldPath = path.join(process.cwd(), "uploads", "profile", student.profile_image);
+      if (fs.existsSync(oldPath)) {
+        try {
+          fs.unlinkSync(oldPath);
+        } catch (e) {
+          console.error("Error deleting old profile image:", e);
+        }
+      }
+    }
+
+    await pool.query(
+      "UPDATE student SET profile_image = ? WHERE user_id = ?",
+      [filename, req.user.user_id]
+    );
+
+    res.json({
+      message: "Profile image uploaded successfully",
+      profile_image: filename
+    });
+  } catch (err) {
+    console.error("PROFILE IMAGE UPLOAD ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const removeProfileImage = async (req, res) => {
+  try {
+    const student = await findStudentByUserId(req.user.user_id);
+    if (!student) return res.status(404).json({ message: "Student not found" });
+
+    if (student.profile_image) {
+      const oldPath = path.join(process.cwd(), "uploads", "profile", student.profile_image);
+      if (fs.existsSync(oldPath)) {
+        try {
+          fs.unlinkSync(oldPath);
+        } catch (e) {
+          console.error("Error deleting profile image:", e);
+        }
+      }
+    }
+
+    await pool.query(
+      "UPDATE student SET profile_image = NULL WHERE user_id = ?",
+      [req.user.user_id]
+    );
+
+    res.json({ message: "Profile image removed successfully" });
+  } catch (err) {
+    console.error("PROFILE IMAGE REMOVE ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -146,6 +146,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createVisitorRequest, getVisitorProfiles } from "../api/visitor.api";
+import { FiX, FiUser, FiAlertTriangle } from "react-icons/fi";
 
 const inputClass =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all";
@@ -204,7 +205,7 @@ const CreateRequestModal = ({ onClose, onSaved }) => {
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white text-gray-400 hover:text-gray-600 transition-colors"
           >
-            ✕
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 
@@ -217,7 +218,7 @@ const CreateRequestModal = ({ onClose, onSaved }) => {
             </p>
             {profiles.length === 0 ? (
               <div className="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                <p className="text-2xl mb-1">👤</p>
+                <FiUser className="w-8 h-8 text-gray-300 mx-auto mb-1" />
                 <p className="text-sm text-gray-500">No visitor profiles found.</p>
                 <p className="text-xs text-gray-400">Add some profiles first.</p>
               </div>
@@ -281,8 +282,8 @@ const CreateRequestModal = ({ onClose, onSaved }) => {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5">
-              ⚠️ {error}
+            <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 flex items-center gap-1.5">
+              <FiAlertTriangle className="w-4 h-4 text-red-500 shrink-0" /> {error}
             </p>
           )}
         </div>

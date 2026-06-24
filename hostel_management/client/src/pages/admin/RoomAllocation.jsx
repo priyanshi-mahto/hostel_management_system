@@ -9,6 +9,7 @@ import {
   getAllHostels,
   getAllocatableStudents,
 } from "../../api/admin.api";
+import { FiHome, FiGrid, FiBookOpen, FiSearch, FiX } from "react-icons/fi";
 
 export default function RoomAllocation() {
   const [activeTab, setActiveTab] = useState("rooms");
@@ -199,15 +200,15 @@ export default function RoomAllocation() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowRoomModal(true)}
-            className="px-4 py-2.5 border border-teal-600 text-teal-600 hover:bg-teal-50 rounded-xl text-sm font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2.5 border border-teal-600 text-teal-600 hover:bg-teal-50 rounded-xl text-sm font-semibold transition-colors"
           >
-            + Add Room
+            <FiHome className="w-4 h-4" /> Add Room
           </button>
           <button
             onClick={() => openAllocationModal()}
-            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-md"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-md"
           >
-            🔑 Allocate Room
+            <FiGrid className="w-4 h-4" /> Allocate Room
           </button>
         </div>
       </div>
@@ -227,27 +228,34 @@ export default function RoomAllocation() {
       </div>
 
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5 w-fit">
-        {["rooms", "allocations"].map((tab) => (
+        {[
+          { id: "rooms", label: "Rooms", icon: <FiHome className="w-4 h-4" /> },
+          { id: "allocations", label: "Allocations", icon: <FiBookOpen className="w-4 h-4" /> }
+        ].map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${activeTab === tab ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab.id ? "bg-white text-teal-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
-            {tab === "rooms" ? "🏠 Rooms" : "📋 Allocations"}
+            {tab.icon}
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
 
       {activeTab === "rooms" && (
         <>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-5 flex flex-wrap gap-3 items-center">
-            <input
-              type="text"
-              placeholder="Search rooms by floor, room no, or unit..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-64 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
-            />
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-5 flex flex-wrap gap-3 items-center w-full">
+            <div className="relative flex-1 min-w-64">
+              <input
+                type="text"
+                placeholder="Search rooms by floor, room no, or unit..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
+              />
+              <FiSearch className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+            </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -305,7 +313,7 @@ export default function RoomAllocation() {
             })}
             {!loading && filteredRooms.length === 0 && (
               <div className="col-span-3 bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">
-                <p className="text-4xl mb-2">🏠</p>
+                <FiHome className="w-10 h-10 text-gray-300 mx-auto mb-2" />
                 <p className="font-medium">No rooms found</p>
               </div>
             )}
@@ -349,7 +357,7 @@ export default function RoomAllocation() {
             </table>
             {!loading && allocations.length === 0 && (
               <div className="text-center py-12 text-gray-400">
-                <p className="text-4xl mb-2">📋</p>
+                <FiBookOpen className="w-10 h-10 text-gray-300 mx-auto mb-2" />
                 <p className="font-medium">No allocations found</p>
               </div>
             )}
@@ -362,7 +370,9 @@ export default function RoomAllocation() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-800">Allocate Room</h3>
-              <button onClick={() => setShowAllocModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowAllocModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FiX className="w-5 h-5" />
+              </button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -405,7 +415,9 @@ export default function RoomAllocation() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-800">Add Room</h3>
-              <button onClick={() => setShowRoomModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              <button onClick={() => setShowRoomModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FiX className="w-5 h-5" />
+              </button>
             </div>
             <div className="p-6 space-y-4">
               <div>

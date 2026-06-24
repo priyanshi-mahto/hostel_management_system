@@ -2,6 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/AdminLayout";
 import { approveAdminLeave, getAdminDashboard, rejectAdminLeave } from "../../api/admin.api";
+import {
+  FiBookOpen,
+  FiHome,
+  FiFileText,
+  FiCalendar,
+  FiKey,
+  FiBell,
+  FiActivity,
+  FiClock,
+  FiCheck,
+  FiX
+} from "react-icons/fi";
 
 const statusBadge = (status) => {
   const map = {
@@ -82,28 +94,28 @@ export default function AdminDashboard() {
         label: "Total Students",
         value: base.totalStudents ?? 0,
         change: "assigned to this hostel",
-        icon: "🎓",
+        icon: <FiBookOpen className="w-8 h-8" />,
         color: "from-teal-500 to-teal-600",
       },
       {
         label: "Occupied Rooms",
         value: base.occupiedRooms ?? 0,
         change: `of ${base.totalRooms ?? 0} rooms`,
-        icon: "🏠",
+        icon: <FiHome className="w-8 h-8" />,
         color: "from-emerald-500 to-emerald-600",
       },
       {
         label: "Pending Complaints",
         value: base.pendingComplaints ?? 0,
         change: "need attention",
-        icon: "📋",
+        icon: <FiFileText className="w-8 h-8" />,
         color: "from-amber-500 to-orange-500",
       },
       {
         label: "Pending Leaves",
         value: base.pendingLeaves ?? 0,
         change: "needs review",
-        icon: "📅",
+        icon: <FiCalendar className="w-8 h-8" />,
         color: "from-purple-500 to-purple-600",
       },
     ];
@@ -121,7 +133,7 @@ export default function AdminDashboard() {
     <AdminLayout>
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-teal-600 to-emerald-500 rounded-2xl p-6 mb-6 text-white shadow-lg">
-        <h2 className="text-2xl font-bold">Welcome back, Admin 👋</h2>
+        <h2 className="text-2xl font-bold">Welcome back, Admin</h2>
         <p className="text-teal-100 mt-1 text-sm">Here's what's happening in your hostel today.</p>
       </div>
 
@@ -149,7 +161,9 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Occupancy */}
         <div className="lg:col-span-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-bold text-gray-800 mb-4">🏨 Hostel Occupancy</h3>
+          <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <FiHome className="w-5 h-5 text-teal-600" /> Hostel Occupancy
+          </h3>
           <div className="space-y-4">
             {dashboard?.occupancy ? (() => {
               const pct = dashboard.occupancy.total
@@ -181,18 +195,18 @@ export default function AdminDashboard() {
             <h4 className="text-sm font-bold text-gray-700 mb-3">Quick Actions</h4>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: "Students", icon: "🎓", path: "/admin/students" },
-                { label: "Allot Room", icon: "🔑", path: "/admin/rooms" },
-                { label: "Send Notice", icon: "📣", path: "/admin/notifications" },
-                { label: "Complaints", icon: "📊", path: "/admin/complaints" },
+                { label: "Students", icon: <FiBookOpen className="w-5 h-5" />, path: "/admin/students" },
+                { label: "Allot Room", icon: <FiKey className="w-5 h-5" />, path: "/admin/rooms" },
+                { label: "Send Notice", icon: <FiBell className="w-5 h-5" />, path: "/admin/notifications" },
+                { label: "Complaints", icon: <FiActivity className="w-5 h-5" />, path: "/admin/complaints" },
               ].map((a, i) => (
                 <button
                   key={i}
                   onClick={() => navigate(a.path)}
-                  className="flex flex-col items-center gap-1 p-3 bg-teal-50 hover:bg-teal-100 rounded-xl transition-colors text-teal-800 text-xs font-medium"
+                  className="flex flex-col items-center gap-1.5 p-3 bg-teal-50 hover:bg-teal-100 rounded-xl transition-colors text-teal-800 text-xs font-medium"
                 >
-                  <span className="text-xl">{a.icon}</span>
-                  {a.label}
+                  {a.icon}
+                  <span>{a.label}</span>
                 </button>
               ))}
             </div>
@@ -202,7 +216,9 @@ export default function AdminDashboard() {
         {/* Recent Complaints */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-800">📋 Recent Complaints</h3>
+            <h3 className="font-bold text-gray-800 flex items-center gap-2">
+              <FiFileText className="w-5 h-5 text-teal-600" /> Recent Complaints
+            </h3>
             <button onClick={() => navigate("/admin/complaints")} className="text-xs text-teal-600 hover:underline">View all →</button>
           </div>
           <div className="overflow-x-auto">
@@ -244,7 +260,9 @@ export default function AdminDashboard() {
       {/* Leave Requests */}
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-800">📅 Pending Leave Requests</h3>
+          <h3 className="font-bold text-gray-800 flex items-center gap-2">
+            <FiCalendar className="w-5 h-5 text-teal-600" /> Pending Leave Requests
+          </h3>
           <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">
             {(dashboard?.recentLeaves || []).filter((l) => l.status === "PENDING").length} Pending
           </span>
@@ -263,22 +281,22 @@ export default function AdminDashboard() {
                   {l.status}
                 </span>
                 {l.status === "PENDING" && (
-                  <>
+                  <div className="flex gap-1.5">
                     <button
                       disabled={leaveActionId === l.id}
                       onClick={() => handleLeaveAction(l.id, "approve")}
-                      className="px-3 py-1 bg-teal-500 text-white rounded-lg text-xs hover:bg-teal-600 disabled:bg-teal-300 transition-colors"
+                      className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white rounded-lg text-xs font-semibold transition-colors"
                     >
-                      Approve
+                      <FiCheck className="w-3.5 h-3.5" /> Approve
                     </button>
                     <button
                       disabled={leaveActionId === l.id}
                       onClick={() => handleLeaveAction(l.id, "reject")}
-                      className="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 disabled:opacity-60 transition-colors"
+                      className="flex items-center gap-1 px-2.5 py-1 bg-red-100 hover:bg-red-200 disabled:opacity-60 text-red-600 rounded-lg text-xs font-semibold transition-colors"
                     >
-                      Reject
+                      <FiX className="w-3.5 h-3.5" /> Reject
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

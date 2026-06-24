@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getVisitorProfiles } from "../api/visitor.api";
+import { FiUser } from "react-icons/fi";
 
 const ManageProfilesModal = ({ onClose }) => {
   const [profiles, setProfiles] = useState([]);
@@ -41,7 +42,7 @@ const ManageProfilesModal = ({ onClose }) => {
 
         {filteredProfiles.length === 0 ? (
           <div className="empty-state small">
-            <div className="icon">👤</div>
+            <div className="icon"><FiUser className="w-8 h-8 text-gray-300 mx-auto" /></div>
             <h4>No visitor profiles found</h4>
             <p>You have not added any visitor profiles yet.</p>
           </div>

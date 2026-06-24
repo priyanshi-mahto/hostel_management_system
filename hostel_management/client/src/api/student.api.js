@@ -24,3 +24,15 @@ export const createVisitingRequest = async (data) => {
   const res = await axios.post("/student/visiting-request", data);
   return res.data;
 };
+
+export const uploadStudentProfileImage = async (formData) => {
+  const res = await axios.post("/student/profile-image", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  return res.data;
+};
+
+export const deleteStudentProfileImage = async () => {
+  const res = await axios.delete("/student/profile-image");
+  return res.data;
+};

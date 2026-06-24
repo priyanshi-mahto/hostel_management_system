@@ -1,13 +1,79 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getStudentProfile, updateStudentProfile } from "../../api/student.api";
+import axios from "../../api/axios";
+import { getStudentProfile, updateStudentProfile, uploadStudentProfileImage, deleteStudentProfileImage } from "../../api/student.api";
 import StudentLayout from "../../components/StudentLayout";
+import { FiUser, FiUsers, FiInfo } from "react-icons/fi";
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(true);
   const [saveError, setSaveError] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const apiBase = (axios.defaults?.baseURL || "http://localhost:5001/api").replace(/\/+api\/?$/i, "");
+  const avatarUrl = profileImage
+    ? (profileImage.startsWith("http") ? profileImage : `${apiBase}/uploads/profile/${profileImage}`)
+    : null;
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      alert("Image must be smaller than 1MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("profile_image", file);
+
+    try {
+      setUploading(true);
+      const res = await uploadStudentProfileImage(formData);
+      setProfileImage(res.profile_image);
+
+      // Update local storage user profile cache
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const u = JSON.parse(stored);
+        u.profile_image = res.profile_image;
+        localStorage.setItem("user", JSON.stringify(u));
+      }
+      alert("Profile photo updated!");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to upload photo");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePhotoRemove = async () => {
+    if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
+
+    try {
+      setUploading(true);
+      await deleteStudentProfileImage();
+      setProfileImage("");
+
+      // Update local storage user profile cache
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const u = JSON.parse(stored);
+        u.profile_image = null;
+        localStorage.setItem("user", JSON.stringify(u));
+      }
+      alert("Profile photo removed!");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to remove photo");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const [profile, setProfile] = useState({
     name: "",
@@ -57,6 +123,8 @@ export default function EditProfile() {
         phone: data.phone || "",
         address,
       });
+
+      setProfileImage(data.profile_image || "");
 
       const mappedGuardians = Array.isArray(data.guardians) && data.guardians.length
         ? data.guardians.map((g) => ({
@@ -207,8 +275,9 @@ export default function EditProfile() {
     <StudentLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Info Note */}
-        <div className="bg-teal-50 border border-teal-100 rounded-2xl p-4 text-sm text-teal-800">
-          📍 You can edit both <strong>Profile Info</strong> and <strong>Guardian Info</strong>. Use the tabs below to switch sections, then click Save Changes.
+        <div className="bg-teal-50 border border-teal-100 rounded-2xl p-4 text-sm text-teal-800 flex items-center gap-2">
+          <FiInfo className="w-4 h-4 text-teal-600 shrink-0" />
+          <span>You can edit both <strong>Profile Info</strong> and <strong>Guardian Info</strong>. Use the tabs below to switch sections, then click Save Changes.</span>
         </div>
 
         {/* Tab Headers */}
@@ -221,7 +290,9 @@ export default function EditProfile() {
                 : "border-transparent text-gray-400 hover:text-gray-600"
             }`}
           >
-            👤 Profile Info
+            <span className="flex items-center gap-1.5">
+              <FiUser className="w-4 h-4" /> Profile Info
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("guardian")}
@@ -231,7 +302,9 @@ export default function EditProfile() {
                 : "border-transparent text-gray-400 hover:text-gray-600"
             }`}
           >
-            👨‍👩‍👧 Guardian Info
+            <span className="flex items-center gap-1.5">
+              <FiUsers className="w-4 h-4" /> Guardian Info
+            </span>
           </button>
         </div>
 
@@ -239,6 +312,54 @@ export default function EditProfile() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           {activeTab === "profile" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Profile Photo Upload/Remove Section */}
+              <div className="md:col-span-2 flex flex-col sm:flex-row items-center gap-5 pb-5 border-b border-gray-100 mb-2">
+                <div className="relative group">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt="Profile Preview"
+                      className="w-24 h-24 rounded-full object-cover ring-4 ring-teal-50 shadow-md"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-teal-50 border-2 border-dashed border-teal-200 text-teal-800 font-black text-3xl flex items-center justify-center shadow-inner uppercase">
+                      {profile.name ? profile.name.trim().charAt(0) : "?"}
+                    </div>
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 items-center sm:items-start">
+                  <h4 className="font-bold text-gray-800 text-base">Profile Photo</h4>
+                  <p className="text-xs text-gray-400 font-medium">Accepts PNG, JPG or JPEG. Max size 1MB.</p>
+                  <div className="flex gap-3 mt-1">
+                    <label className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl cursor-pointer shadow-md shadow-teal-100 transition-colors">
+                      {uploading ? "Uploading..." : "Upload New Photo"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        disabled={uploading}
+                        className="hidden"
+                      />
+                    </label>
+                    {profileImage && (
+                      <button
+                        type="button"
+                        onClick={handlePhotoRemove}
+                        disabled={uploading}
+                        className="px-4 py-2.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-colors"
+                      >
+                        Remove Photo
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
                 <input

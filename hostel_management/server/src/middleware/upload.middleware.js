@@ -35,3 +35,25 @@ export const upload = multer({
   fileFilter,
   limits: { fileSize: 1024 * 1024 } // 1MB
 });
+
+const profileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    try {
+      const dir = path.join(process.cwd(), "uploads", "profile");
+      fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    } catch (err) {
+      cb(err);
+    }
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+
+export const uploadProfile = multer({
+  storage: profileStorage,
+  fileFilter,
+  limits: { fileSize: 1024 * 1024 } // 1MB
+});

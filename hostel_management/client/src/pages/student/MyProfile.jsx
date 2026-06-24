@@ -182,11 +182,13 @@
 // }
 
 
+import axios from "../../api/axios";
 import ChangePasswordModal from "../../components/ChangePassword";
 import { useEffect, useState } from "react";
 import { getStudentProfile } from "../../api/student.api";
 import StudentLayout from "../../components/StudentLayout";
 import { useNavigate } from "react-router-dom";
+import { FiUser, FiUsers, FiHome, FiEdit2, FiLock } from "react-icons/fi";
 
 function InfoRow({ label, value }) {
   return (
@@ -242,11 +244,17 @@ export default function MyProfile() {
         <div className="bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex flex-col items-center text-center gap-3">
             <div className="relative">
-              <img
-                src={data.profile_image || "https://i.pravatar.cc/150"}
-                alt="profile"
-                className="w-20 h-20 rounded-2xl object-cover ring-4 ring-emerald-400/50"
-              />
+              {data.profile_image ? (
+                <img
+                  src={data.profile_image.startsWith("http") ? data.profile_image : `${(axios.defaults?.baseURL || "http://localhost:5001/api").replace(/\/+api\/?$/i, "")}/uploads/profile/${data.profile_image}`}
+                  alt="profile"
+                  className="w-20 h-20 rounded-2xl object-cover ring-4 ring-emerald-400/50"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-teal-700 border-2 border-dashed border-teal-500 text-emerald-300 font-black text-3xl flex items-center justify-center shadow-inner uppercase">
+                  {data.name ? data.name.trim().charAt(0) : "?"}
+                </div>
+              )}
               <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-400 text-teal-900 text-xs font-black px-2 py-0.5 rounded-full">
                 Student
               </span>
@@ -262,22 +270,22 @@ export default function MyProfile() {
             <div className="flex gap-3 w-full pt-1">
               <button
                 onClick={() => navigate("/student/edit-profile")}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-teal-900 text-sm font-bold transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-teal-900 text-sm font-bold transition-colors flex items-center justify-center gap-2"
               >
-                ✏️ Edit Profile
+                <FiEdit2 className="w-4 h-4" /> Edit Profile
               </button>
               <button
                 onClick={() => setShowPasswordModal(true)}
-                className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold border border-white/20 transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold border border-white/20 transition-colors flex items-center justify-center gap-2"
               >
-                🔐 Change Password
+                <FiLock className="w-4 h-4" /> Change Password
               </button>
             </div>
           </div>
         </div>
 
         {/* Personal Info */}
-        <Section title="Personal Information" icon="👤">
+        <Section title="Personal Information" icon={<FiUser className="w-5 h-5 text-teal-600" />}>
           <InfoRow label="Full Name"    value={data.name} />
           <InfoRow label="Email"        value={data.email} />
           <InfoRow label="Phone"        value={data.phone} />
@@ -289,7 +297,7 @@ export default function MyProfile() {
         </Section>
 
         {/* Guardian Info */}
-        <Section title="Guardian Information" icon="👨‍👩‍👧">
+        <Section title="Guardian Information" icon={<FiUsers className="w-5 h-5 text-teal-600" />}>
           {Array.isArray(data.guardians) && data.guardians.length > 0 ? (
             data.guardians.map((g, i) => (
               <div key={g.guardian_id || i} className={i > 0 ? "mt-4 pt-4 border-t border-gray-100" : ""}>
@@ -313,7 +321,7 @@ export default function MyProfile() {
         </Section>
 
         {/* Hostel Info */}
-        <Section title="Hostel Information" icon="🏠">
+        <Section title="Hostel Information" icon={<FiHome className="w-5 h-5 text-teal-600" />}>
           <InfoRow label="Hostel" value={data.hostel_name} />
           <InfoRow label="Unit"   value={data.unit} />
           <InfoRow label="Room"   value={data.room_no} />

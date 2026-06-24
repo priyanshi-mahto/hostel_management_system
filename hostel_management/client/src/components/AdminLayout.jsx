@@ -1,16 +1,42 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  FiGrid,
+  FiBookOpen,
+  FiHome,
+  FiFileText,
+  FiUsers,
+  FiShield,
+  FiCreditCard,
+  FiSearch,
+  FiBell,
+  FiChevronLeft,
+  FiChevronRight,
+  FiLogOut
+} from "react-icons/fi";
+
+const iconMap = {
+  "/admin/dashboard": <FiGrid className="w-5 h-5" />,
+  "/admin/students": <FiBookOpen className="w-5 h-5" />,
+  "/admin/rooms": <FiHome className="w-5 h-5" />,
+  "/admin/complaints": <FiFileText className="w-5 h-5" />,
+  "/admin/visitors": <FiUsers className="w-5 h-5" />,
+  "/admin/staff": <FiShield className="w-5 h-5" />,
+  "/admin/id-cards": <FiCreditCard className="w-5 h-5" />,
+  "/admin/lost-found": <FiSearch className="w-5 h-5" />,
+  "/admin/notifications": <FiBell className="w-5 h-5" />,
+};
 
 const navItems = [
-  { path: "/admin/dashboard", label: "Dashboard", icon: "⊞" },
-  { path: "/admin/students", label: "Students", icon: "🎓" },
-  { path: "/admin/rooms", label: "Room Allocation", icon: "🏠" },
-  { path: "/admin/complaints", label: "Complaints", icon: "📋" },
-  { path: "/admin/visitors", label: "Visitor Requests", icon: "👥" },
-  { path: "/admin/staff", label: "Warden & Staff", icon: "👤" },
-  { path: "/admin/id-cards", label: "ID Verification", icon: "🪪" },
-  { path: "/admin/lost-found", label: "Lost & Found", icon: "🔍" },
-  { path: "/admin/notifications", label: "Notifications", icon: "🔔" },
+  { path: "/admin/dashboard", label: "Dashboard" },
+  { path: "/admin/students", label: "Students" },
+  { path: "/admin/rooms", label: "Room Allocation" },
+  { path: "/admin/complaints", label: "Complaints" },
+  { path: "/admin/visitors", label: "Visitor Requests" },
+  { path: "/admin/staff", label: "Warden & Staff" },
+  { path: "/admin/id-cards", label: "ID Verification" },
+  { path: "/admin/lost-found", label: "Lost & Found" },
+  { path: "/admin/notifications", label: "Notifications" },
 ];
 
 export default function AdminLayout({ children }) {
@@ -46,7 +72,7 @@ export default function AdminLayout({ children }) {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="ml-auto text-teal-300 hover:text-white transition-colors"
           >
-            {sidebarOpen ? "◀" : "▶"}
+            {sidebarOpen ? <FiChevronLeft className="w-4 h-4" /> : <FiChevronRight className="w-4 h-4" />}
           </button>
         </div>
 
@@ -64,7 +90,7 @@ export default function AdminLayout({ children }) {
                     : "text-teal-200 hover:bg-teal-700 hover:text-white"
                   }`}
               >
-                <span className="text-lg shrink-0">{item.icon}</span>
+                <span className="text-lg shrink-0">{iconMap[item.path]}</span>
                 {sidebarOpen && (
                   <span className="text-sm truncate">{item.label}</span>
                 )}
@@ -84,7 +110,7 @@ export default function AdminLayout({ children }) {
               !sidebarOpen && "justify-center"
             }`}
           >
-            <span className="text-lg">🚪</span>
+            <FiLogOut className="w-5 h-5 shrink-0" />
             {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
           </button>
         </div>
@@ -111,7 +137,7 @@ export default function AdminLayout({ children }) {
                 placeholder="Search..."
                 className="pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 w-52"
               />
-              <span className="absolute left-3 top-2.5 text-gray-400 text-sm">🔎</span>
+              <FiSearch className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
             </div>
             <div className="w-9 h-9 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
               A

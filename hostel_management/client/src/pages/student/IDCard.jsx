@@ -218,18 +218,30 @@ import { useState, useEffect } from "react";
 import StudentLayout from "../../components/StudentLayout";
 import axios from "../../api/axios";
 import { getStudentProfile } from "../../api/student.api";
+import {
+  FiAlertCircle,
+  FiCheckCircle,
+  FiXCircle,
+  FiCreditCard,
+  FiImage,
+  FiLock,
+  FiFolder,
+  FiInfo,
+  FiUploadCloud,
+  FiClock
+} from "react-icons/fi";
 
 const statusConfig = {
-  PENDING:  { label: "Pending Review", color: "bg-amber-100 text-amber-700 border-amber-200",   icon: "⏳" },
-  VERIFIED: { label: "Verified",       color: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: "✅" },
-  REJECTED: { label: "Rejected",       color: "bg-red-100 text-red-600 border-red-200",          icon: "❌" },
+  PENDING:  { label: "Pending Review", color: "bg-amber-100 text-amber-700 border-amber-200",   icon: <FiClock className="w-5 h-5" /> },
+  VERIFIED: { label: "Verified",       color: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: <FiCheckCircle className="w-5 h-5" /> },
+  REJECTED: { label: "Rejected",       color: "bg-red-100 text-red-600 border-red-200",          icon: <FiXCircle className="w-5 h-5" /> },
 };
 
 function ImageUploadBox({ label, preview, onChange, disabled }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 bg-gray-50">
-        <span className="text-base">🪪</span>
+        <FiCreditCard className="w-4 h-4 text-teal-600" />
         <h3 className="font-bold text-gray-700 text-sm">{label}</h3>
       </div>
 
@@ -240,19 +252,19 @@ function ImageUploadBox({ label, preview, onChange, disabled }) {
             <img src={preview} alt={label} className="w-full h-full object-contain" />
           ) : (
             <div className="text-center">
-              <p className="text-3xl mb-1">🖼️</p>
+              <FiImage className="w-8 h-8 text-gray-300 mx-auto mb-1" />
               <p className="text-xs text-gray-400">No image uploaded</p>
             </div>
           )}
         </div>
 
         {disabled ? (
-          <div className="w-full py-2.5 rounded-xl bg-gray-100 border border-gray-200 text-sm text-gray-400 text-center font-medium">
-            🔒 Verified — upload disabled
+          <div className="w-full py-2.5 rounded-xl bg-gray-100 border border-gray-200 text-sm text-gray-400 text-center font-medium flex items-center justify-center gap-1.5">
+            <FiLock className="w-3.5 h-3.5" /> Verified — upload disabled
           </div>
         ) : (
-          <label className="block w-full py-2.5 rounded-xl border border-teal-200 text-sm font-semibold text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer text-center">
-            📁 Change Image
+          <label className="block w-full py-2.5 rounded-xl border border-teal-200 text-sm font-semibold text-teal-700 hover:bg-teal-50 transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5">
+            <FiFolder className="w-4 h-4" /> Change Image
             <input type="file" accept="image/*" hidden onChange={onChange} />
           </label>
         )}
@@ -336,7 +348,7 @@ export default function IDCard() {
 
         {/* Info Banner */}
         <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 flex gap-3">
-          <span className="text-xl shrink-0 mt-0.5">ℹ️</span>
+          <FiInfo className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="text-sm text-blue-700">Upload clear images of both sides of your student ID card for verification by hostel staff and security.</p>
             <p className="text-xs text-blue-500 font-semibold">Maximum file size: 1MB per image</p>
@@ -380,14 +392,18 @@ export default function IDCard() {
         <button
           onClick={uploadImages}
           disabled={status === "VERIFIED" || uploading}
-          className="w-full py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm transition-colors shadow-lg shadow-teal-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm transition-colors shadow-lg shadow-teal-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {uploading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               Uploading...
             </span>
-          ) : "⬆️ Upload ID Card"}
+          ) : (
+            <span className="flex items-center justify-center gap-2">
+              <FiUploadCloud className="w-4 h-4" /> Upload ID Card
+            </span>
+          )}
         </button>
 
       </div>

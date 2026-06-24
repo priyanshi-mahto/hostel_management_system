@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AdminLayout from "../../components/AdminLayout";
 import { getAdminStudents } from "../../api/admin.api";
+import { FiRefreshCw, FiSearch, FiX, FiCheck, FiXCircle } from "react-icons/fi";
 
 export default function StudentManagement() {
   const [students, setStudents] = useState([]);
@@ -74,7 +75,7 @@ export default function StudentManagement() {
           onClick={loadStudents}
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-md"
         >
-          <span>↻</span> Refresh
+          <FiRefreshCw className="w-4 h-4" /> Refresh
         </button>
       </div>
 
@@ -89,7 +90,7 @@ export default function StudentManagement() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
-            <span className="absolute left-3 top-3 text-gray-400">🔎</span>
+            <FiSearch className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
           </div>
         </div>
       </div>
@@ -137,33 +138,33 @@ export default function StudentManagement() {
                   <td className="px-5 py-3">
                     {s.phoneAdded ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                        ✓ {s.phone}
+                        <FiCheck className="w-3.5 h-3.5" /> {s.phone}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                        ✗ No
+                        <FiXCircle className="w-3.5 h-3.5" /> No
                       </span>
                     )}
                   </td>
                   <td className="px-5 py-3">
                     {s.hasGuardian ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                        ✓ Added
+                        <FiCheck className="w-3.5 h-3.5" /> Added
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                        ✗ No
+                        <FiXCircle className="w-3.5 h-3.5" /> No
                       </span>
                     )}
                   </td>
                   <td className="px-5 py-3">
                     {s.hasAddress ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                        ✓ Added
+                        <FiCheck className="w-3.5 h-3.5" /> Added
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                        ✗ No
+                        <FiXCircle className="w-3.5 h-3.5" /> No
                       </span>
                     )}
                   </td>
@@ -173,7 +174,7 @@ export default function StudentManagement() {
           </table>
           {!loading && filtered.length === 0 && (
             <div className="text-center py-12 text-gray-400">
-              <p className="text-4xl mb-2">🔍</p>
+              <FiSearch className="w-10 h-10 text-gray-300 mx-auto mb-2" />
               <p className="font-medium">No students found</p>
             </div>
           )}
@@ -194,7 +195,9 @@ export default function StudentManagement() {
                   <p className="text-gray-400 text-sm">{selectedStudent.roll}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedStudent(null)} className="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+              <button onClick={() => setSelectedStudent(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FiX className="w-6 h-6" />
+              </button>
             </div>
 
             <div className="p-6 space-y-4">
